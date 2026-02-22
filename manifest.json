@@ -1,0 +1,18 @@
+{
+  "name": "Ferme Connectée",
+  "short_name": "FarmsConnect",
+  "description": "Surveillance et pilotage agricole",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#15803d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
