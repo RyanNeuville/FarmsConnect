@@ -10,6 +10,12 @@ body {
     /* slate-800 */
 }
 
+
+/* animation smouth */
+html {
+    scroll-behavior: smooth;
+}
+
 /* Hide scrollbar */
 ::-webkit-scrollbar {
     width: 0px;
