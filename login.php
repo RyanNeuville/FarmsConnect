@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * Recherche sécurisée de l'utilisateur par adresse électronique 
          * via une requête préparée prévenant les attaques par injection SQL.
          */
-        $stmt = $pdo->prepare('SELECT id, nom, mot_de_passe FROM utilisateurs WHERE email = :email LIMIT 1');
+        $stmt = $pdo->prepare('SELECT id, nom, mot_de_passe, email FROM utilisateurs WHERE email = :email LIMIT 1');
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
@@ -29,6 +29,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * Vérification du hashage cryptographique du mot de passe fourni 
          * avec l'entrelacement stocké de manière sécurisée en base.
          */
+        // affichage du mot de passe et des hash
+        echo "<pre>";
+        echo $user['email'];
+        echo "<br>";
+        echo $user['mot_de_passe'];
+        echo "<br>";
+        echo $password;
+        echo "<br>";
+        echo "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi";
+        echo "</pre>";
         if ($user && password_verify($password, $user['mot_de_passe'])) {
             /* Initialisation de l'environnement de session applicatif de l'opérateur */
             $_SESSION['user_id'] = $user['id'];
@@ -45,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<?php 
 /* Intégration du composant de dépendances UI */
 require_once 'includes/functions.php';
 
@@ -67,7 +78,7 @@ require 'includes/header.php';
       <!-- LOGO -->
       <div class="flex flex-col items-center mb-10">
         <div class="w-20 h-20 mb-4 rounded-3xl shadow-lg shadow-green-500/20 overflow-hidden flex items-center justify-center bg-white border border-slate-100">
-          <img src="assets/icon.svg" alt="FarmsConnect Logo" class="w-20 h-20 object-contain" />
+          <img src="assets/icon.png" alt="FarmsConnect Logo" class="w-20 h-20 object-contain" />
         </div>
         <h1 class="text-3xl font-black text-[#0f2b46] tracking-tight">FarmsConnect</h1>
         <p class="text-sm font-bold text-slate-400 mt-1">Votre exploitation au bout des doigts</p>
@@ -85,12 +96,12 @@ require 'includes/header.php';
       <form action="login.php" method="POST" class="space-y-4">
         <div class="relative input-group">
           <i data-lucide="mail" class="w-5 h-5 input-icon"></i>
-          <input type="email" name="email" placeholder="Adresse e-mail" required class="input-field shadow-sm" value="jean@ferme.fr" />
+          <input type="email" name="email" placeholder="Adresse e-mail" required class="input-field shadow-sm" />
         </div>
 
         <div class="relative input-group">
           <i data-lucide="lock" class="w-5 h-5 input-icon"></i>
-          <input type="password" name="password" placeholder="Mot de passe" required class="input-field shadow-sm" value="password123" />
+          <input type="password" name="password" placeholder="Mot de passe" required class="input-field shadow-sm" />
           <button type="button" onclick="document.querySelector('input[name=password]').type = document.querySelector('input[name=password]').type === 'password' ? 'text' : 'password';" class="absolute top-1/2 right-4 -translate-y-1/2 text-slate-400 p-1">
             <i data-lucide="eye" class="w-4 h-4"></i>
           </button>
