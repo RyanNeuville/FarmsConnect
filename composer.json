@@ -1,0 +1,22 @@
+{
+    "name": "ryan-neuville/farmsconnect",
+    "description": "FarmsConnect - Application de gestion de ferme connectée",
+    "type": "project",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "^3.11"
+    },
+    "scripts": {
+        "build": "php -l *.php && php -l includes/*.php && php -l api/*.php && php -l config/*.php",
+        "test": "phpcs --standard=PSR12 --ignore=vendor/ .",
+        "test-local": "@build"
+    },
+    "authors": [
+        {
+            "name": "Ryan Neuville"
+        }
+    ]
+}
