@@ -34,64 +34,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
-<!doctype html>
-<html lang="fr" class="antialiased">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>FarmsConnect - Connexion</title>
+// Inclure les helpers
+require_once 'includes/functions.php';
 
-    <meta name="theme-color" content="#ffffff" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="assets/icon.svg" />
+$page_title = 'FarmsConnect - Connexion';
+$body_class = 'flex flex-col h-[100dvh] overflow-hidden login-bg pt-safe pb-safe';
+$hide_main = true;
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <link rel="stylesheet" href="css/app.css" />
-
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              green: { 500: "#22c55e", 600: "#16a34a" },
-              slate: { 50: "#f8fafc", 100: "#f1f5f9", 400: "#94a3b8", 800: "#1e293b" },
-            },
-            fontFamily: { sans: ["Nunito", "sans-serif"] },
-          },
-        },
-      };
-    </script>
-    <style>
-      .login-bg { background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 100%); }
-      .input-field {
-        width: 100%;
-        padding: 14px 16px 14px 44px;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        background-color: #ffffff;
-        font-weight: 700;
-        color: #0f2b46;
-        outline: none;
-        transition: all 0.2s;
-      }
-      .input-field:focus {
-        border-color: #22c55e;
-        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1);
-      }
-      .input-icon {
-        position: absolute;
-        top: 50%;
-        left: 16px;
-        transform: translateY(-50%);
-        color: #94a3b8;
-        transition: color 0.2s;
-      }
-      .input-group:focus-within .input-icon { color: #22c55e; }
-    </style>
-</head>
-<body class="flex flex-col h-[100dvh] overflow-hidden login-bg pt-safe pb-safe">
+require 'includes/header.php';
+?>
 
     <!-- TOP HEADER -->
     <div class="p-6 flex justify-end">
@@ -166,8 +117,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </a>
     </div>
 
-    <script>
-      lucide.createIcons();
-    </script>
-</body>
-</html>
+<?php
+require 'includes/footer.php';
+?>

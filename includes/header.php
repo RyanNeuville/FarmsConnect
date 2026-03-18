@@ -1,8 +1,11 @@
 <?php
 // Fichier: includes/header.php
-// Variables attendues avant l'inclusion: $page_title
+// Variables attendues avant l'inclusion: $page_title, $body_class, $hide_main
 if (!isset($page_title)) {
     $page_title = 'FarmsConnect';
+}
+if (!isset($body_class)) {
+    $body_class = 'flex flex-col h-[100dvh] overflow-hidden bg-[#fafbfd]';
 }
 ?>
 <!doctype html>
@@ -33,5 +36,7 @@ if (!isset($page_title)) {
       };
     </script>
 </head>
-<body class="flex flex-col h-[100dvh] overflow-hidden bg-[#fafbfd]">
+<body class="<?= htmlspecialchars($body_class) ?>">
+<?php if (!isset($hide_main)): ?>
     <main class="flex-1 overflow-y-auto px-4 pb-24 pt-safe">
+<?php endif; ?>

@@ -9,46 +9,14 @@ $stmt = $pdo->query("SELECT * FROM equipements ORDER BY id ASC");
 $equipements = $stmt->fetchAll();
 $nbTotal = count($equipements);
 
-// Helpers pour l'UI
-function getStatusHelpers($statut) {
-    if ($statut === 'normal') return ['bg' => 'green', 'text' => 'Normal'];
-    if ($statut === 'alerte') return ['bg' => 'orange', 'text' => 'Alerte'];
-    if ($statut === 'critique') return ['bg' => 'red', 'text' => 'Critique'];
-    if ($statut === 'arret') return ['bg' => 'grey', 'text' => 'Arrêté'];
-    if ($statut === 'marche') return ['bg' => 'green', 'text' => 'Marche'];
-    return ['bg' => 'grey', 'text' => 'Inconnu'];
-}
-?>
-<!doctype html>
-<html lang="fr" class="antialiased">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>FarmsConnect - Équipements</title>
-    <meta name="theme-color" content="#ffffff" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="assets/icon.svg" />
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="css/app.css" />
+// Inclure les helpers
+require_once 'includes/functions.php';
 
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              green: { 500: "#22c55e", 600: "#16a34a" },
-              slate: { 50: "#f8fafc", 100: "#f1f5f9", 400: "#94a3b8", 500: "#64748b", 800: "#1e293b" },
-            },
-            fontFamily: { sans: ["Nunito", "sans-serif"] },
-          },
-        },
-      };
-    </script>
-</head>
-<body class="flex flex-col h-[100dvh] overflow-hidden bg-[#fafbfd]">
-    <main class="flex-1 overflow-y-auto px-4 pb-24 pt-safe">
+$page_title = 'FarmsConnect - Équipements';
+$active_nav = 'equipements';
+
+require 'includes/header.php';
+?>
       <!-- HEADER -->
       <header class="flex items-center gap-3 mt-4 mb-6">
         <div class="w-12 h-12 bg-brand-green-light rounded-2xl flex items-center justify-center text-green-600">
@@ -101,35 +69,7 @@ function getStatusHelpers($statut) {
       </div>
     </main>
 
-    <!-- BOTTOM NAVIGATION -->
-    <nav class="absolute bottom-0 w-full bottom-nav pt-3 pb-safe z-50">
-      <ul class="flex justify-around items-center px-2">
-        <li>
-          <a href="index.php" class="nav-item w-16">
-            <div class="p-1.5 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5"></i></div>
-            <span>Accueil</span>
-          </a>
-        </li>
-        <li>
-          <a href="alertes.php" class="nav-item w-16">
-            <div class="p-1.5 flex items-center justify-center"><i data-lucide="bell" class="w-5 h-5"></i></div>
-            <span>Alertes</span>
-          </a>
-        </li>
-        <li>
-          <a href="equipements.php" class="nav-item active w-16">
-            <div class="bg-brand-green-light rounded-xl p-1.5 flex items-center justify-center"><i data-lucide="tractor" class="w-5 h-5 text-green-500"></i></div>
-            <span>Équipements</span>
-          </a>
-        </li>
-        <li>
-          <a href="reglages.php" class="nav-item w-16">
-            <div class="p-1.5 flex items-center justify-center"><i data-lucide="settings" class="w-5 h-5"></i></div>
-            <span>Réglages</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-    <script>lucide.createIcons();</script>
-</body>
-</html>
+<?php
+require 'includes/nav.php';
+require 'includes/footer.php';
+?>
