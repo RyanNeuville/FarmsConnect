@@ -1,0 +1,207 @@
+<?php
+// Fichier: alertes.php
+require_once 'config/db.php';
+require_once 'includes/auth.php';
+
+forcer_connexion();
+
+$stmt = $pdo->query("SELECT a.*, e.nom as equipement_nom FROM alertes a JOIN equipements e ON a.equipement_id = e.id ORDER BY a.cree_le DESC");
+$alertes = $stmt->fetchAll();
+
+$critiques = [];
+$importantes = [];
+$nonLues = 0;
+
+foreach ($alertes as $a) {
+    if (!$a['est_lu']) {
+        $nonLues++;
+    }
+    if ($a['niveau'] === 'critique') {
+        $critiques[] = $a;
+    } else {
+        $importantes[] = $a;
+    }
+}
+
+function formatDate($dateStr) {
+    $d = new DateTime($dateStr);
+    return $d->format('d M. à H:i');
+}
+?>
+<!doctype html>
+<html lang="fr" class="antialiased">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>FarmsConnect - Alertes</title>
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="assets/icon.svg" />
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="css/app.css" />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              green: { 500: "#22c55e", 600: "#16a34a" },
+              slate: { 50: "#f8fafc", 100: "#f1f5f9", 400: "#94a3b8", 500: "#714b3d", 800: "#1e293b" },
+            },
+            fontFamily: { sans: ["Nunito", "sans-serif"] },
+          },
+        },
+      };
+    </script>
+</head>
+<body class="flex flex-col h-[100dvh] overflow-hidden bg-[#fafbfd]">
+    <main class="flex-1 overflow-y-auto px-4 pb-24 pt-safe">
+      <!-- HEADER -->
+      <header class="flex items-center gap-3 mt-4 mb-6">
+        <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
+          <i data-lucide="bell" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="text-[1.3rem] font-black text-[#0f2b46] leading-tight">Alertes</h1>
+          <p class="text-xs text-slate-400 font-bold"><?= $nonLues ?> non lues</p>
+        </div>
+      </header>
+
+      <!-- CRITIQUES SECTION -->
+      <?php if (!empty($critiques)): ?>
+      <div class="mb-6">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-2 h-2 rounded-full bg-red-500"></span>
+          <h2 class="text-[11px] font-black text-red-500 uppercase tracking-wider">Critiques (<?= count($critiques) ?>)</h2>
+        </div>
+
+        <div class="space-y-3">
+          <?php foreach ($critiques as $alerte): ?>
+          <div class="bg-white rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] border border-slate-100 border-l-4 border-l-red-500 p-4 relative <?= $alerte['est_lu'] ? 'opacity-60' : '' ?>">
+            <?php if (!$alerte['est_lu']): ?>
+            <a href="api/read_alert.php?id=<?= $alerte['id'] ?>" class="absolute top-3 right-3 text-slate-300 hover:text-red-500">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </a>
+            <?php endif; ?>
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center text-red-500 shrink-0">
+                <i data-lucide="alert-circle" class="w-5 h-5"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-1.5 mb-1">
+                  <?php if (!$alerte['est_lu']): ?><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><?php endif; ?>
+                  <h3 class="text-sm font-bold text-[#0f2b46]"><?= htmlspecialchars($alerte['equipement_nom']) ?></h3>
+                </div>
+                <p class="text-[11px] text-slate-500 font-semibold mb-3"><?= htmlspecialchars($alerte['message']) ?></p>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] text-slate-400 font-bold"><?= formatDate($alerte['cree_le']) ?></span>
+                  <div class="flex gap-2">
+                    <?php if (!$alerte['est_lu']): ?>
+                    <a href="api/read_alert.php?id=<?= $alerte['id'] ?>" class="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                      <i data-lucide="eye" class="w-3 h-3"></i> Lu
+                    </a>
+                    <?php endif; ?>
+                    <a href="detail.php?id=<?= $alerte['equipement_id'] ?>" class="bg-[#d1fae5] text-[#059669] px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                      Voir <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endif; ?>
+
+      <!-- IMPORTANTS SECTION -->
+      <?php if (!empty($importantes)): ?>
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <span class="w-2 h-2 rounded-full bg-orange-400"></span>
+          <h2 class="text-[11px] font-black text-orange-400 uppercase tracking-wider">Importants (<?= count($importantes) ?>)</h2>
+        </div>
+
+        <div class="space-y-3">
+          <?php foreach ($importantes as $alerte): ?>
+          <div class="bg-white rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] border border-slate-100 border-l-4 border-l-orange-400 p-4 relative <?= $alerte['est_lu'] ? 'opacity-60' : '' ?>">
+            <?php if (!$alerte['est_lu']): ?>
+            <a href="api/read_alert.php?id=<?= $alerte['id'] ?>" class="absolute top-3 right-3 text-slate-300 hover:text-orange-500">
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </a>
+            <?php endif; ?>
+            <div class="flex items-start gap-3">
+              <div class="w-10 h-10 bg-orange-50 rounded-lg flex items-center justify-center text-orange-500 shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5"></i>
+              </div>
+              <div class="flex-1">
+                <div class="flex items-center gap-1.5 mb-1">
+                  <?php if (!$alerte['est_lu']): ?><span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span><?php endif; ?>
+                  <h3 class="text-sm font-bold text-[#0f2b46]"><?= htmlspecialchars($alerte['equipement_nom']) ?></h3>
+                </div>
+                <p class="text-[11px] text-slate-500 font-semibold mb-3"><?= htmlspecialchars($alerte['message']) ?></p>
+
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] text-slate-400 font-bold"><?= formatDate($alerte['cree_le']) ?></span>
+                  <div class="flex gap-2">
+                    <?php if (!$alerte['est_lu']): ?>
+                    <a href="api/read_alert.php?id=<?= $alerte['id'] ?>" class="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                      <i data-lucide="eye" class="w-3 h-3"></i> Lu
+                    </a>
+                    <?php endif; ?>
+                    <a href="detail.php?id=<?= $alerte['equipement_id'] ?>" class="bg-[#d1fae5] text-[#059669] px-3 py-1.5 rounded-lg text-[10px] font-bold flex items-center gap-1">
+                      Voir <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endif; ?>
+
+      <?php if (empty($critiques) && empty($importantes)): ?>
+        <div class="text-center py-10 text-slate-400">
+            <i data-lucide="check-circle" class="w-12 h-12 mx-auto mb-3 opacity-50"></i>
+            <p class="font-bold">Aucune alerte pour le moment</p>
+        </div>
+      <?php endif; ?>
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="absolute bottom-0 w-full bottom-nav pt-3 pb-safe z-50">
+      <ul class="flex justify-around items-center px-2">
+        <li>
+          <a href="index.php" class="nav-item w-16">
+            <div class="p-1.5 flex items-center justify-center"><i data-lucide="home" class="w-5 h-5"></i></div>
+            <span>Accueil</span>
+          </a>
+        </li>
+        <li>
+          <a href="alertes.php" class="nav-item active w-16">
+            <div class="bg-brand-green-light rounded-xl p-1.5 flex items-center justify-center"><i data-lucide="bell" class="w-5 h-5 text-green-500"></i></div>
+            <span>Alertes</span>
+          </a>
+        </li>
+        <li>
+          <a href="equipements.php" class="nav-item w-16">
+            <div class="p-1.5 flex items-center justify-center"><i data-lucide="tractor" class="w-5 h-5"></i></div>
+            <span>Équipements</span>
+          </a>
+        </li>
+        <li>
+          <a href="reglages.php" class="nav-item w-16">
+            <div class="p-1.5 flex items-center justify-center"><i data-lucide="settings" class="w-5 h-5"></i></div>
+            <span>Réglages</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
