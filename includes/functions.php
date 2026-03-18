@@ -1,14 +1,29 @@
 <?php
-// Fichier: includes/functions.php
+/*
+ * Fichier : includes/functions.php
+ * Regroupe les fonctions de rendu (helpers UI) pour l'ensemble du projet, permettant de
+ * maintenir une architecture de présentation DRY (Don't Repeat Yourself).
+ */
 
-// Helper pour afficher la flèche de tendance (simulé pour le moment)
+/**
+ * Calcule et renvoie un indicateur visuel de tendance de valeur pour l'instrumentation.
+ * 
+ * @param mixed $valeur La valeur courante mesurée
+ * @param string $type La désignation du capteur ciblé
+ * @return string Balise HTML (icône) indiquant graphiquement la dynamique de la métrique
+ */
 function getTrendIcon($valeur, $type) {
     if ($type === 'Serre 1' || $type === 'Batterie Nord') return '<i data-lucide="arrow-down" class="w-3 h-3 text-blue-500"></i>';
     if ($type === 'Humidité sol') return '<i data-lucide="arrow-up" class="w-3 h-3 text-red-500"></i>';
     return '<i data-lucide="arrow-down" class="w-3 h-3 text-blue-500"></i>';
 }
 
-// Helper pour le badge statut principal
+/**
+ * Génère le composant d'interface (badge textuel avec point d'état) correspondant au statut de l'équipement.
+ * 
+ * @param string $statut La classification de l'état asynchrone (ex: 'normal', 'critique', 'arret')
+ * @return string Chaîne HTML prête à l'intégration DOM
+ */
 function getStatusBadge($statut) {
     if ($statut === 'normal') {
         return '<span class="pill green"><span class="status-dot green"></span> Normal</span>';
@@ -24,7 +39,13 @@ function getStatusBadge($statut) {
     return '';
 }
 
-// Helper pour le formatage du bouton actionneur
+/**
+ * Assemble les classes et propriétés visuelles d'un bouton de commande interactif
+ * lié au contrôle d'un actionneur spécifique.
+ * 
+ * @param string $statut L'état d'opérabilité courant ('marche' ou 'arret')
+ * @return string Le code markup configuré du bouton de soumission
+ */
 function getActionButton($statut) {
     if ($statut === 'marche') {
         return '<button type="submit" name="action" value="0" class="bg-green-100 text-green-700 font-black text-xs py-2.5 rounded-xl w-full flex items-center justify-center gap-1 shadow-sm border border-green-200"><span class="w-[6px] h-[6px] rounded-full bg-green-500 block"></span> MARCHE</button>';
@@ -33,7 +54,13 @@ function getActionButton($statut) {
     }
 }
 
-// Helper pour les textes/couleurs brutes de statut
+/**
+ * Évalue le statut de fonctionnement et renvoie le dictionnaire de configuration
+ * des propriétés cosmétiques (fond chromatique, format textuel) pour le moteur de rendu.
+ * 
+ * @param string $statut Sémantique définissant la sévérité du capteur (ex: 'alerte')
+ * @return array Tableau associatif comportant les clés 'bg' et 'text'
+ */
 function getStatusHelpers($statut) {
     if ($statut === 'normal') return ['bg' => 'green', 'text' => 'Normal'];
     if ($statut === 'alerte') return ['bg' => 'orange', 'text' => 'Alerte'];
@@ -43,7 +70,13 @@ function getStatusHelpers($statut) {
     return ['bg' => 'grey', 'text' => 'Inconnu'];
 }
 
-// Helper pour le formatage des dates
+/**
+ * Procède à la conversion d'une chaîne SQL Date/Time standardisée vers un format
+ * textuel raccourci propre à l'interface mobile (ex: "18 Mar. à 14:30").
+ * 
+ * @param string $dateStr La date au format standardisé d'entrée
+ * @return string La date transformée lisible par un être humain
+ */
 function formatDate($dateStr) {
     try {
         $d = new DateTime($dateStr);

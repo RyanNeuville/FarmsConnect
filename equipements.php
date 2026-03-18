@@ -1,5 +1,9 @@
 <?php
-// Fichier: equipements.php
+/*
+ * Fichier : equipements.php
+ * Vue récapitulative exhaustive de l'infrastructure robotique en place.
+ * Fournit un diagnostic rapide et des points d'accès vers les panneaux détaillés.
+ */
 require_once 'config/db.php';
 require_once 'includes/auth.php';
 
@@ -9,7 +13,7 @@ $stmt = $pdo->query("SELECT * FROM equipements ORDER BY id ASC");
 $equipements = $stmt->fetchAll();
 $nbTotal = count($equipements);
 
-// Inclure les helpers
+/* Implémentation du dictionnaire graphique unifié */
 require_once 'includes/functions.php';
 
 $page_title = 'FarmsConnect - Équipements';
@@ -28,13 +32,13 @@ require 'includes/header.php';
         </div>
       </header>
 
-      <!-- Status Banner -->
+      <!-- BANNIÈRE DE TÉLÉMÉTRIE GLOBALE (STATUS BANNER) -->
       <div class="bg-brand-green-light rounded-xl p-3 mb-6 flex items-center gap-2">
         <i data-lucide="wifi" class="w-4 h-4 text-green-600"></i>
         <span class="font-bold text-green-600 text-[13px]">Connecté – données en temps réel</span>
       </div>
 
-      <!-- LIST -->
+      <!-- ITÉRATION ET AFFICHAGE DES UNITÉS CONNECTÉES -->
       <div class="space-y-3">
         <?php foreach ($equipements as $eq): 
             $helpers = getStatusHelpers($eq['statut']);

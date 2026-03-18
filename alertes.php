@@ -1,10 +1,18 @@
 <?php
-// Fichier: alertes.php
+/*
+ * Fichier : alertes.php
+ * Interface de triage et de supervision des notifications système.
+ * Assure la communication des anomalies via un journal d'événements persistant.
+ */
 require_once 'config/db.php';
 require_once 'includes/auth.php';
 
 forcer_connexion();
 
+/*
+ * Double jointure implicite pour récupérer les détails de l'alerte
+ * ainsi que le contexte matériel affecté, le tout projeté chronologiquement.
+ */
 $stmt = $pdo->query("SELECT a.*, e.nom as equipement_nom FROM alertes a JOIN equipements e ON a.equipement_id = e.id ORDER BY a.cree_le DESC");
 $alertes = $stmt->fetchAll();
 
@@ -23,7 +31,7 @@ foreach ($alertes as $a) {
     }
 }
 
-// Inclure les helpers
+/* Intégration des dépendances visuelles partagées de l'application */
 require_once 'includes/functions.php';
 
 $page_title = 'FarmsConnect - Alertes';
@@ -43,7 +51,7 @@ require 'includes/header.php';
         </div>
       </header>
 
-      <!-- CRITIQUES SECTION -->
+      <!-- BLOC DES ALERTES DE SÉVÉRITÉ MAXIMALE (CRITIQUES) -->
       <?php if (!empty($critiques)): ?>
       <div class="mb-6">
         <div class="flex items-center gap-2 mb-3">
@@ -91,7 +99,7 @@ require 'includes/header.php';
       </div>
       <?php endif; ?>
 
-      <!-- IMPORTANTS SECTION -->
+      <!-- BLOC DES AVERTISSEMENTS ORANGES (IMPORTANTES) -->
       <?php if (!empty($importantes)): ?>
       <div>
         <div class="flex items-center gap-2 mb-3">

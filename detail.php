@@ -1,5 +1,9 @@
 <?php
-// Fichier: detail.php
+/*
+ * Fichier : detail.php
+ * Interface modulaire de monitoring détaillé pour un capteur d'équipement spécifique.
+ * Gère le rendu de l'historique graphique et l'affichage des limites de tolérance (seuils).
+ */
 require_once 'config/db.php';
 require_once 'includes/auth.php';
 
@@ -16,7 +20,10 @@ if (!$capteur) {
     exit;
 }
 
-// Helpers pour le statut
+/*
+ * Structure de mappage colorimétrique associant un état métier de la sonde
+ * (normal, alerte, critique) avec la palette de styles graphiques UI du badge.
+ */
 $statusColors = [
     'normal' => ['bg' => '#dcfce7', 'text' => '#16a34a', 'dot' => '#16a34a', 'label' => 'Normal'],
     'alerte' => ['bg' => '#fef3c7', 'text' => '#d97706', 'dot' => '#f59e0b', 'label' => 'Alerte'],
@@ -25,7 +32,10 @@ $statusColors = [
 
 $couleurStatus = $statusColors[$capteur['statut']] ?? $statusColors['normal'];
 
-// Gestion de la couleur principale en fonction de la table DB
+/* 
+ * Définition du thème chromatique dominant de l'interface composant
+ * aligné avec le code couleur natif du capteur défini dans la structure base de données.
+ */
 $mainColorMap = [
     'green' => '#22c55e',
     'orange' => '#f59e0b',
@@ -35,7 +45,10 @@ $mainColorMap = [
 ];
 $mainBgColor = $mainColorMap[$capteur['couleur']] ?? '#22c55e';
 
-// Simulation simple de la jauge (calcul du pourcentage)
+/*
+ * Algorithme de jauge de progression visuelle :
+ * Calcule dynamiquement le ratio en pourcentage relatif entre la tolérance plancher et plafond du capteur.
+ */
 $percent = 50;
 if ($capteur['seuil_min'] !== null && $capteur['seuil_max'] !== null && $capteur['seuil_max'] > $capteur['seuil_min']) {
     $percent = (($capteur['valeur_actuelle'] - $capteur['seuil_min']) / ($capteur['seuil_max'] - $capteur['seuil_min'])) * 100;
@@ -44,7 +57,7 @@ if ($capteur['seuil_min'] !== null && $capteur['seuil_max'] !== null && $capteur
     $percent = $capteur['valeur_actuelle'];
 }
 ?>
-// Inclure les helpers
+/* Intégration du moteur partagé de génération d'UI */
 require_once 'includes/functions.php';
 
 $page_title = 'FarmsConnect - Détail ' . $capteur['nom'];
@@ -73,7 +86,7 @@ require 'includes/header.php';
         </a>
       </header>
 
-      <!-- MAIN SENSOR BLOCK -->
+      <!-- BLOC D'INFORMATION PRINCIPAL DU CAPTEUR EXAMINÉ (MAIN SENSOR BLOCK) -->
       <div class="rounded-[24px] p-5 text-white mb-6 relative overflow-hidden shadow-sm" style="background-color: <?= $mainBgColor ?>">
         <div class="flex items-center gap-3 mb-6 relative z-10">
           <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -97,7 +110,7 @@ require 'includes/header.php';
         </div>
       </div>
 
-      <!-- CHART (SVG) -->
+      <!-- VUE GRAPHIQUE HISTORIQUE INTÉGRÉE (CHART SVG 7 JOURS) -->
       <div class="card-border p-5 mb-5 rounded-2xl">
         <h3 class="text-xs font-black text-[#0f2b46] mb-4 text-left">Historique 7 jours</h3>
         <div class="h-28 w-full mt-4 flex flex-col justify-end relative">
@@ -125,7 +138,7 @@ require 'includes/header.php';
         </div>
       </div>
 
-      <!-- SEUILS -->
+      <!-- AFFICHAGE DES CRITÈRES DE LIMITES OPÉRATIONNELLES (SEUILS) -->
       <?php if ($capteur['seuil_min'] !== null || $capteur['seuil_max'] !== null): ?>
       <div class="card-border p-5 rounded-2xl">
         <h3 class="text-xs font-black text-[#0f2b46] mb-4 text-left">Seuils d'alerte</h3>

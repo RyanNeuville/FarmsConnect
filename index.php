@@ -1,15 +1,22 @@
 <?php
-// Fichier: index.php
+/*
+ * Fichier : index.php
+ * Contrôleur principal et vue du tableau de bord interactif (Dashboard).
+ * Agrége les données temps réel des équipements et l'état général du système.
+ */
 require_once 'config/db.php';
 require_once 'includes/auth.php';
 
-// Obliger l'utilisateur à être connecté
+/* Vérification de la validité de session (blocage de l'accès public) */
 forcer_connexion();
 
-// Récupérer le nom de l'utilisateur
+/* Extraction sécurisée de l'identité de session (par défaut sur Utilisateur si non trouvé) */
 $user_nom = $_SESSION['user_nom'] ?? 'Utilisateur';
 
-// Récupérer tous les équipements
+/*
+ * Requête globale de récupération de l'ensemble de l'inventaire matériel
+ * afin d'hydrater l'interface de contrôle sans requêtes itératives successives.
+ */
 $stmt = $pdo->query("SELECT * FROM equipements ORDER BY id ASC");
 $equipements = $stmt->fetchAll();
 
@@ -23,11 +30,14 @@ foreach ($equipements as $eq) {
     }
 }
 
-// Récupérer le nombre d'alertes non lues
+/*
+ * Comptage rapide du volume d'anomalies non purgées 
+ * pour le badge de notification global.
+ */
 $stmtAlertes = $pdo->query("SELECT COUNT(*) as nb FROM alertes WHERE est_lu = 0");
 $alertesCount = $stmtAlertes->fetch()['nb'];
 
-// Inclure les helpers
+/* Inclusion logique UI et encapsulation layout globale */
 require_once 'includes/functions.php';
 
 $page_title = 'FarmsConnect - Accueil';
@@ -60,21 +70,21 @@ require 'includes/header.php';
         </div>
       </header>
 
-      <!-- Weather summary -->
+      <!-- RÉSUMÉ MÉTÉOROLOGIQUE (WEATHER WIDGET) -->
       <div class="flex items-center gap-1.5 text-sm font-bold text-slate-500 mb-4 px-1">
         <i data-lucide="sun" class="w-5 h-5 text-orange-400"></i>
         <span class="text-slate-800">22°C</span>
         <span class="font-semibold text-slate-400">Ensoleillé</span>
       </div>
 
-      <!-- Global Status Banner -->
+      <!-- BANNIÈRE GLOBALE DE STATUT (STATUS BANNER) -->
       <div class="bg-brand-green-light border border-brand-green rounded-xl p-3 mb-6">
         <p class="font-bold text-green-600 text-sm">
           Bonjour <?= htmlspecialchars($user_nom) ?>, Tout va bien 🌾
         </p>
       </div>
 
-      <!-- SENSORS GRID -->
+      <!-- GRILLE DES CAPTEURS DE MESURE (SENSORS GRID) -->
       <div class="grid grid-cols-2 gap-3 mb-4">
         <?php foreach ($capteurs as $cap): ?>
         <div class="card-border p-3 flex flex-col justify-between">
@@ -104,7 +114,7 @@ require 'includes/header.php';
         <?php endforeach; ?>
       </div>
 
-      <!-- ACTUATORS GRID -->
+      <!-- GRILLE DES ACTIONNEURS DE CONTRÔLE (ACTUATORS GRID) -->
       <div class="grid grid-cols-2 gap-3 mb-8">
         <?php foreach ($actionneurs as $act): ?>
         <div class="card-border p-3">
@@ -123,7 +133,7 @@ require 'includes/header.php';
         <?php endforeach; ?>
       </div>
 
-      <!-- RECENT ACTIVITIES (Statics for now, could be dynamic) -->
+      <!-- HISTORIQUE DES CHANGEMENTS D'ÉTAT (RECENT ACTIVITIES) -->
       <h2 class="text-xs font-black text-slate-500 mb-3 uppercase tracking-wider px-1">Activités récentes</h2>
       <div class="card-border mb-4">
         <div class="flex justify-between items-center p-4 border-b border-slate-100">

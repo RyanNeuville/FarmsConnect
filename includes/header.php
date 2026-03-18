@@ -1,6 +1,14 @@
 <?php
-// Fichier: includes/header.php
-// Variables attendues avant l'inclusion: $page_title, $body_class, $hide_main
+/*
+ * Fichier : includes/header.php
+ * Gère l'en-tête HTML commun à l'ensemble de l'application. 
+ * Initialise le framework CSS Tailwind et la bibliothèque d'icônes Lucide.
+ * 
+ * Variables globales attendues avant l'inclusion :
+ * @var string $page_title Titre de la page inséré dans la balise <title>
+ * @var string $body_class Classes CSS spécifiques à appliquer sur la balise <body>
+ * @var bool $hide_main Si défini, désactive la structure de la balise <main> principale
+ */
 if (!isset($page_title)) {
     $page_title = 'FarmsConnect';
 }

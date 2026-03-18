@@ -1,5 +1,9 @@
 <?php
-// Fichier: reglages.php
+/*
+ * Fichier : reglages.php
+ * Interface d'administration pour la configuration des seuils opérationnels des capteurs.
+ * Interagit avec la base de données pour calibrer le déclenchement des alertes automatiques.
+ */
 require_once 'config/db.php';
 require_once 'includes/auth.php';
 
@@ -7,7 +11,7 @@ forcer_connexion();
 
 $message_succes = '';
 
-// Si soumission du formulaire
+/* Interception et traitement du flux POST lors de la soumission du formulaire de configuration */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $min_1 = (float)$_POST['min_1'];
     $max_1 = (float)$_POST['max_1'];
@@ -16,19 +20,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $min_3 = (float)$_POST['min_3'];
     $min_4 = (float)$_POST['min_4'];
 
-    // Mise à jour temp (Serre 1)
+    /* Application récursive des nouveaux paramètres de seuil pour la température (ID 1) */
     $pdo->prepare("UPDATE equipements SET seuil_min = ?, seuil_max = ? WHERE id = 1")->execute([$min_1, $max_1]);
-    // Humidite
+    /* Application des paramètres de seuil pour le capteur d'humidité du sol (ID 2) */
     $pdo->prepare("UPDATE equipements SET seuil_min = ?, seuil_max = ? WHERE id = 2")->execute([$min_2, $max_2]);
-    // Reservoir (Max 100 on touch pas pour l'UI actuel)
+    /* Seuil bas du réservoir d'eau (Le paramètre max est figé structurellement à 100%) (ID 3) */
     $pdo->prepare("UPDATE equipements SET seuil_min = ? WHERE id = 3")->execute([$min_3]);
-    // Batterie
+    /* Seuil minimal critique de tension pour les batteries (ID 4) */
     $pdo->prepare("UPDATE equipements SET seuil_min = ? WHERE id = 4")->execute([$min_4]);
 
     $message_succes = 'Réglages enregistrés avec succès.';
 }
 
-// Récupération des seuils existants
+/* Synchronisation initiale des valeurs actuelles conservées en base pour pré-remplir le formulaire */
 $stmt = $pdo->query("SELECT id, seuil_min, seuil_max FROM equipements WHERE type = 'capteur'");
 $capteursDb = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $seuils = [];
@@ -36,7 +40,7 @@ foreach ($capteursDb as $c) {
     $seuils[$c['id']] = $c;
 }
 ?>
-// Inclure les helpers
+/* Inclusion des fonctions utilitaires partagées d'affichage HTML */
 require_once 'includes/functions.php';
 
 $page_title = 'FarmsConnect - Réglages';
@@ -58,7 +62,7 @@ require 'includes/header.php';
       </div>
       <?php endif; ?>
 
-      <!-- NOTIFICATIONS -->
+      <!-- PARAMÉTRES DES NOTIFICATIONS (NOTIFICATIONS) -->
       <div class="card-border p-4 mb-6">
         <div class="flex items-center gap-2 mb-4">
           <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-500"><i data-lucide="bell" class="w-3.5 h-3.5"></i></div>
@@ -80,7 +84,7 @@ require 'includes/header.php';
       <form action="reglages.php" method="POST">
           <h2 class="text-xs font-black text-slate-500 mb-3 uppercase tracking-wider px-1">SEUILS D'ALERTE</h2>
 
-          <!-- FORM: TEMPÉRATURE -->
+          <!-- FORMULAIRE CIBLÉ : TEMPÉRATURE AMBIANTE -->
           <div class="card-border p-4 mb-3">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-orange-100 rounded-md flex items-center justify-center text-orange-500"><i data-lucide="thermometer" class="w-3.5 h-3.5"></i></div>
@@ -98,7 +102,7 @@ require 'includes/header.php';
             </div>
           </div>
 
-          <!-- FORM: HUMIDITÉ -->
+          <!-- FORMULAIRE CIBLÉ : HUMIDITÉ DU SOL -->
           <div class="card-border p-4 mb-3">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-500"><i data-lucide="droplets" class="w-3.5 h-3.5"></i></div>
@@ -116,7 +120,7 @@ require 'includes/header.php';
             </div>
           </div>
 
-          <!-- FORM: RÉSERVOIR -->
+          <!-- FORMULAIRE CIBLÉ : NIVEAU HYDRIQUE -->
           <div class="card-border p-4 mb-3">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-cyan-100 rounded-md flex items-center justify-center text-cyan-500"><i data-lucide="droplet" class="w-3.5 h-3.5"></i></div>
@@ -130,7 +134,7 @@ require 'includes/header.php';
             </div>
           </div>
 
-          <!-- FORM: BATTERIE -->
+          <!-- FORMULAIRE CIBLÉ : AUTONOMIE ÉNERGÉTIQUE -->
           <div class="card-border p-4 mb-6">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-500"><i data-lucide="battery-medium" class="w-3.5 h-3.5"></i></div>
@@ -144,7 +148,7 @@ require 'includes/header.php';
             </div>
           </div>
 
-          <!-- ACTION BUTTONS -->
+          <!-- ZONES D'ACTIONS DE SAUVEGARDE ET DE CONNEXION (ACTION BUTTONS) -->
           <button type="submit" class="btn-primary mb-3 flex items-center justify-center gap-2 w-full">
             <i data-lucide="save" class="w-4 h-4"></i> Enregistrer les réglages
           </button>

@@ -1,14 +1,34 @@
 <?php
-// Fichier: includes/nav.php
-// Variable attendue avant inclusion: $active_nav ('accueil', 'alertes', 'equipements', 'reglages')
+/*
+ * Fichier : includes/nav.php
+ * Composant de navigation inférieur fixe (Bottom Navigation Bar) de l'application.
+ * 
+ * Variable attendue avant l'inclusion :
+ * @var string $active_nav Identifiant de l'onglet actif ('accueil', 'alertes', 'equipements', 'reglages')
+ */
 if (!isset($active_nav)) {
     $active_nav = 'accueil';
 }
 
+/**
+ * Détermine la classe CSS de l'élément de navigation général selon son état actif.
+ * 
+ * @param string $item L'identifiant clé de cet onglet
+ * @param string $active L'identifiant de l'onglet actuellement actif
+ * @return string La classe CSS finale pour le rendu
+ */
 function getNavClass($item, $active) {
     return ($item === $active) ? 'nav-item active w-16' : 'nav-item w-16';
 }
 
+/**
+ * Renvoie le conteneur HTML stylisé spécifiquement si l'onglet est actif
+ * (intégration d'un fond de surbrillance asymétrique).
+ * 
+ * @param string $item
+ * @param string $active
+ * @return string Conteneur div interne
+ */
 function getNavInnerContainer($item, $active) {
     if ($item === $active) {
         return '<div class="bg-brand-green-light rounded-xl p-1.5 flex items-center justify-center">';
@@ -16,6 +36,14 @@ function getNavInnerContainer($item, $active) {
     return '<div class="p-1.5 flex items-center justify-center">';
 }
 
+/**
+ * Détermine la couleur contextuelle de l'icône vectorielle Lucide.
+ * 
+ * @param string $item
+ * @param string $active
+ * @param string $baseIcons Les classes de base structurelles de l'icône
+ * @return string
+ */
 function getNavIconClass($item, $active, $baseIcons) {
     if ($item === $active) {
         return $baseIcons . ' text-green-500';
@@ -23,7 +51,7 @@ function getNavIconClass($item, $active, $baseIcons) {
     return $baseIcons;
 }
 ?>
-    <!-- BOTTOM NAVIGATION -->
+    <!-- COMPOSANT DE NAVIGATION BASSE (BOTTOM NAVIGATION) -->
     <nav class="absolute bottom-0 w-full bottom-nav pt-3 pb-safe z-50">
       <ul class="flex justify-around items-center px-2">
         <li>

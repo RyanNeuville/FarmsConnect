@@ -1,5 +1,9 @@
 <?php
-// Fichier: actionneur.php
+/*
+ * Fichier : actionneur.php
+ * Interface de contrôle direct pour un dispositif actionneur matériel.
+ * Charge l'état de l'actionneur et offre l'interface de commutation (marche/arrêt).
+ */
 require_once 'config/db.php';
 require_once 'includes/auth.php';
 
@@ -18,8 +22,11 @@ if (!$actionneur) {
 
 $estEnMarche = ($actionneur['statut'] === 'marche');
 
-// Definition des etats
-$bgColor = $estEnMarche ? '#22c55e' : '#64748b'; // Vert ou Gris
+/*
+ * Mappage dynamique des états visuels de l'interface graphique selon l'état binaire (marche/arrêt) 
+ * pour fluidifier le rendu côté client et assurer un code maintenable.
+ */
+$bgColor = $estEnMarche ? '#22c55e' : '#64748b'; /* Code hexadécimal de fond (Vert actif, Gris inactif) */
 $txtStatut = $estEnMarche ? 'MARCHE' : 'ARRÊT';
 $btnColor = $estEnMarche ? 'text-red-500 fill-red-500' : 'text-green-600 fill-green-600';
 $btnTxtColor = $estEnMarche ? 'text-red-500' : 'text-green-600';
@@ -31,7 +38,7 @@ $pillText = $estEnMarche ? '#16a34a' : '#64748b';
 $pillDot = $estEnMarche ? '#16a34a' : '#94a3b8';
 $pillLabel = $estEnMarche ? 'Marche' : 'Arrêté';
 ?>
-// Inclure les helpers
+/* Importation des dépendances UI communes pour préserver la structure DRY */
 require_once 'includes/functions.php';
 
 $page_title = 'FarmsConnect - Actuateur ' . $actionneur['nom'];
@@ -60,7 +67,7 @@ require 'includes/header.php';
         </a>
       </header>
 
-      <!-- MAIN ACTUATOR BLOCK -->
+      <!-- BLOC PRINCIPAL DE CONTRÔLE DE L'ACTIONNEUR (MAIN ACTUATOR BLOCK) -->
       <div class="rounded-[24px] p-6 text-white mb-6 relative overflow-hidden shadow-sm flex flex-col items-center justify-center py-10 transition-colors duration-500" style="background-color: <?= $bgColor ?>">
         <div class="w-full flex items-center gap-3 mb-8">
           <div class="w-11 h-11 bg-white/20 rounded-[14px] flex items-center justify-center backdrop-blur-sm">
