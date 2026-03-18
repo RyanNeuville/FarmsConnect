@@ -29,16 +29,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          * Vérification du hashage cryptographique du mot de passe fourni 
          * avec l'entrelacement stocké de manière sécurisée en base.
          */
-        // affichage du mot de passe et des hash
-        echo "<pre>";
-        echo $user['email'];
-        echo "<br>";
-        echo $user['mot_de_passe'];
-        echo "<br>";
-        echo $password;
-        echo "<br>";
-        echo "$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi";
-        echo "</pre>";
         if ($user && password_verify($password, $user['mot_de_passe'])) {
             /* Initialisation de l'environnement de session applicatif de l'opérateur */
             $_SESSION['user_id'] = $user['id'];
