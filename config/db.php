@@ -7,8 +7,8 @@
 
 $host = 'localhost';
 $db_name = 'farmsconnect';
-$username = 'root'; /* Paramètre à modifier selon les identifiants de sécurité du serveur MySQL */
-$password = ''; /* Paramètre à modifier avec le mot de passe de la base de données en production */
+$username = 'codedrill'; /* Paramètre à modifier selon les identifiants de sécurité du serveur MySQL */
+$password = 'Codedrill@237'; /* Paramètre à modifier avec le mot de passe de la base de données en production */
 
 try {
     /* 
