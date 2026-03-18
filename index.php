@@ -27,76 +27,15 @@ foreach ($equipements as $eq) {
 $stmtAlertes = $pdo->query("SELECT COUNT(*) as nb FROM alertes WHERE est_lu = 0");
 $alertesCount = $stmtAlertes->fetch()['nb'];
 
-// Fonction Helper pour afficher la flèche de tendance
-function getTrendIcon($valeur, $type) {
-    // Une simulation simple de tendance basée sur la valeur actuelle
-    // Dans un vrai système, on comparerait avec l'historique
-    if ($type === 'Serre 1' || $type === 'Batterie Nord') return '<i data-lucide="arrow-down" class="w-3 h-3 text-blue-500"></i>';
-    if ($type === 'Humidité sol') return '<i data-lucide="arrow-up" class="w-3 h-3 text-red-500"></i>';
-    return '<i data-lucide="arrow-down" class="w-3 h-3 text-blue-500"></i>';
-}
+// Inclure les helpers
+require_once 'includes/functions.php';
 
-// Fonction Helper pour le badge statut
-function getStatusBadge($statut) {
-    if ($statut === 'normal') {
-        return '<span class="pill green"><span class="status-dot green"></span> Normal</span>';
-    } elseif ($statut === 'alerte') {
-        return '<span class="pill orange"><span class="status-dot orange" style="background-color:#f59e0b;"></span> Alerte</span>';
-    } elseif ($statut === 'critique') {
-        return '<span class="pill red" style="background-color:#fee2e2;color:#ef4444;"><span class="status-dot red" style="background-color:#ef4444;"></span> Critique</span>';
-    } elseif ($statut === 'arret') {
-        return '<span class="pill grey"><span class="status-dot grey"></span> Arrêté</span>';
-    } elseif ($statut === 'marche') {
-        return '<span class="pill green"><span class="status-dot green"></span> Marche</span>';
-    }
-    return '';
-}
+$page_title = 'FarmsConnect - Accueil';
+$active_nav = 'accueil';
 
-// Helper pour le formatage du bouton actionneur
-function getActionButton($statut) {
-    if ($statut === 'marche') {
-        return '<button class="bg-green-100 text-green-700 font-black text-xs py-2.5 rounded-xl w-full flex items-center justify-center gap-1 shadow-sm border border-green-200"><span class="w-[6px] h-[6px] rounded-full bg-green-500 block"></span> MARCHE</button>';
-    } else {
-        return '<button class="bg-slate-200 text-slate-600 font-black text-xs py-2.5 rounded-xl w-full flex items-center justify-center gap-1 shadow-sm"><span class="w-[6px] h-[6px] rounded-full border border-slate-400 bg-transparent block"></span> ARRÊT</button>';
-    }
-}
+require 'includes/header.php';
 ?>
-<!doctype html>
-<html lang="fr" class="antialiased">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>FarmsConnect - Accueil</title>
 
-    <meta name="theme-color" content="#ffffff" />
-    <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="assets/icon.svg" />
-
-    <!-- Tailwind CSS (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/app.css" />
-
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              green: { 500: "#22c55e", 600: "#16a34a" },
-              slate: { 50: "#f8fafc", 100: "#f1f5f9", 400: "#94a3b8", 800: "#1e293b" },
-            },
-            fontFamily: { sans: ["Nunito", "sans-serif"] },
-          },
-        },
-      };
-    </script>
-  </head>
-  <body class="flex flex-col h-[100dvh] overflow-hidden bg-[#fafbfd]">
-    <!-- Scrollable Content -->
-    <main class="flex-1 overflow-y-auto px-4 pb-24 pt-safe">
       <!-- HEADER -->
       <header class="flex justify-between items-start mt-4 mb-6">
         <div class="flex items-center gap-2">
@@ -208,46 +147,7 @@ function getActionButton($statut) {
       </div>
     </main>
 
-    <!-- BOTTOM NAVIGATION -->
-    <nav class="absolute bottom-0 w-full bottom-nav pt-3 pb-safe z-50">
-      <ul class="flex justify-around items-center px-2">
-        <li>
-          <a href="index.php" class="nav-item active w-16">
-            <div class="bg-brand-green-light rounded-xl p-1.5 flex items-center justify-center">
-              <i data-lucide="home" class="w-5 h-5 text-green-500"></i>
-            </div>
-            <span>Accueil</span>
-          </a>
-        </li>
-        <li>
-          <a href="alertes.php" class="nav-item w-16">
-            <div class="p-1.5 flex items-center justify-center">
-              <i data-lucide="bell" class="w-5 h-5"></i>
-            </div>
-            <span>Alertes</span>
-          </a>
-        </li>
-        <li>
-          <a href="equipements.php" class="nav-item w-16">
-            <div class="p-1.5 flex items-center justify-center">
-              <i data-lucide="tractor" class="w-5 h-5"></i>
-            </div>
-            <span>Équipements</span>
-          </a>
-        </li>
-        <li>
-          <a href="reglages.php" class="nav-item w-16">
-            <div class="p-1.5 flex items-center justify-center">
-              <i data-lucide="settings" class="w-5 h-5"></i>
-            </div>
-            <span>Réglages</span>
-          </a>
-        </li>
-      </ul>
-    </nav>
-
-    <script>
-      lucide.createIcons();
-    </script>
-  </body>
-</html>
+<?php
+require 'includes/nav.php';
+require 'includes/footer.php';
+?>
