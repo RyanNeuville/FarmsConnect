@@ -40,6 +40,7 @@ foreach ($capteursDb as $c) {
     $seuils[$c['id']] = $c;
 }
 ?>
+<?php
 /* Inclusion des fonctions utilitaires partagées d'affichage HTML */
 require_once 'includes/functions.php';
 

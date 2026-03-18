@@ -1,12 +1,12 @@
 <?php
-// Fichier: logout.php
+/* Fichier: logout.php */
 require_once 'includes/auth.php';
 
-// Détruire toutes les variables de session
+/**  Détruire toutes les variables de session */
 $_SESSION = array();
 
-// Si vous voulez détruire complètement la session, effacez également
-// le cookie de session.
+/** Si vous voulez détruire complètement la session, effacez également */
+/** le cookie de session.  */
 if (ini_get("session.use_cookies")) {
     $params = session_get_cookie_params();
     setcookie(session_name(), '', time() - 42000,
@@ -15,10 +15,10 @@ if (ini_get("session.use_cookies")) {
     );
 }
 
-// Finalement, on détruit la session.
+/** Finalement, on détruit la session. */
 session_destroy();
 
-// Redirection vers la page de connexion
+/** Redirection vers la page de connexion  */
 header("Location: login.php");
 exit;
 ?>
