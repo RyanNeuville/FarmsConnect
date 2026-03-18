@@ -50,7 +50,7 @@ require 'includes/header.php';
       <header class="flex justify-between items-start mt-4 mb-6">
         <div class="flex items-center gap-2">
           <div class="w-10 h-10 bg-brand-green-light border border-brand-green rounded-[14px] flex items-center justify-center text-green-600">
-            <img src="assets/icon.svg" alt="FarmsConnect Logo" class="w-6 h-6" />
+            <img src="assets/icon.png" alt="FarmsConnect Logo" class="w-6 h-6" />
           </div>
           <div>
             <h1 class="text-[1.1rem] font-black text-[#0f2b46] leading-tight">FarmsConnect</h1>

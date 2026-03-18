@@ -57,6 +57,7 @@ if ($capteur['seuil_min'] !== null && $capteur['seuil_max'] !== null && $capteur
     $percent = $capteur['valeur_actuelle'];
 }
 ?>
+<?php
 /* Intégration du moteur partagé de génération d'UI */
 require_once 'includes/functions.php';
 

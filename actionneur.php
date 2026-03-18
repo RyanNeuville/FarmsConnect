@@ -38,6 +38,7 @@ $pillText = $estEnMarche ? '#16a34a' : '#64748b';
 $pillDot = $estEnMarche ? '#16a34a' : '#94a3b8';
 $pillLabel = $estEnMarche ? 'Marche' : 'Arrêté';
 ?>
+<?php
 /* Importation des dépendances UI communes pour préserver la structure DRY */
 require_once 'includes/functions.php';
 

@@ -5,10 +5,10 @@
  * Ce script est conçu pour être inclus au tout début du cycle de vie de la requête.
  */
 
-$host = 'localhost';
+$host = '127.0.0.1';
 $db_name = 'farmsconnect';
-$username = 'root'; /* Paramètre à modifier selon les identifiants de sécurité du serveur MySQL */
-$password = ''; /* Paramètre à modifier avec le mot de passe de la base de données en production */
+$username = 'codedrill'; /* Paramètre à modifier selon les identifiants de sécurité du serveur MySQL */
+$password = 'Codedrill@237'; /* Paramètre à modifier avec le mot de passe de la base de données en production */
 
 try {
     /* 
