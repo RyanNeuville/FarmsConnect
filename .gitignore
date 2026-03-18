@@ -1,0 +1,38 @@
+# /FarmsConnect/.gitignore
+
+# Dependencies
+vendor/
+node_modules/
+
+# IDE & Editor settings
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment & Config
+.env
+.env.local
+config/db_credentials.php
+
+# PHP related
+phpunit.xml
+.phpunit.result.cache
+phpcs.xml
+
+# Logs & Cache
+*.log
+*.error
+logs/
+cache/
+
+# User uploads / files
+uploads/
+/public/assets/tmp/
+
+# OS generated files
+Thumbs.db
+.Spotlight-V100
+.Trashes
