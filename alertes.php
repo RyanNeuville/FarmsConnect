@@ -13,7 +13,8 @@ forcer_connexion();
  * Double jointure implicite pour récupérer les détails de l'alerte
  * ainsi que le contexte matériel affecté, le tout projeté chronologiquement.
  */
-$stmt = $pdo->query("SELECT a.*, e.nom as equipement_nom FROM alertes a JOIN equipements e ON a.equipement_id = e.id ORDER BY a.cree_le DESC");
+$stmt = $pdo->prepare("SELECT a.*, e.nom as equipement_nom FROM alertes a JOIN equipements e ON a.equipement_id = e.id ORDER BY a.cree_le DESC");
+$stmt->execute();
 $alertes = $stmt->fetchAll();
 
 $critiques = [];
