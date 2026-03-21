@@ -70,7 +70,7 @@ require 'includes/header.php';
         <div class="w-20 h-20 mb-4 rounded-3xl shadow-lg shadow-green-500/20 overflow-hidden flex items-center justify-center bg-white border border-slate-100">
           <img src="assets/icon.png" alt="FarmsConnect Logo" class="w-20 h-20 object-contain" />
         </div>
-        <h1 class="text-3xl font-black text-[#0f2b46] tracking-tight">FarmsConnect</h1>
+        <h1 class="text-3xl font-black text-brand-dark dark:text-white tracking-tight">FarmsConnect</h1>
         <p class="text-sm font-bold text-slate-400 mt-1">Votre exploitation au bout des doigts</p>
       </div>
 

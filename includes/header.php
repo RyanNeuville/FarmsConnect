@@ -13,7 +13,7 @@ if (!isset($page_title)) {
     $page_title = 'FarmsConnect';
 }
 if (!isset($body_class)) {
-    $body_class = 'flex flex-col h-[100dvh] overflow-hidden bg-[#fafbfd]';
+    $body_class = 'flex flex-col h-[100dvh] overflow-hidden';
 }
 ?>
 <!doctype html>
@@ -31,14 +31,17 @@ if (!isset($body_class)) {
     <link rel="stylesheet" href="css/app.css" />
 
     <script>
-      // Initialisation immédiate du thème pour éviter le flash blanc
+      // Initialisation immédiate du thème pour éviter le flash blanc (FOUC)
+      // On ajoute/retire uniquement sur <html> pour que Tailwind dark: ET les var CSS fonctionnent
       if (localStorage.getItem('theme') === 'dark') {
           document.documentElement.classList.add('dark');
-          document.addEventListener('DOMContentLoaded', () => document.body.classList.add('dark'));
+      } else {
+          document.documentElement.classList.remove('dark');
       }
     </script>
     <script>
       tailwind.config = {
+        darkMode: 'class',
         theme: {
           extend: {
             colors: {
