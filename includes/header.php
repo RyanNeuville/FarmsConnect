@@ -24,7 +24,7 @@ if (!isset($body_class)) {
     <title><?= htmlspecialchars($page_title) ?></title>
     <meta name="theme-color" content="#ffffff" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="apple-touch-icon" href="assets/icon.svg" />
+    <link rel="icon" type="image/x-icon" href="../assets/icon.png" />
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
