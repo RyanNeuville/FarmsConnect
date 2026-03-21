@@ -238,8 +238,10 @@ require 'includes/header.php';
           </a>
         </div>
       </div>
-
+<div class="fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white/95 backdrop-blur-sm z-[999]">
+<?php  require 'includes/nav.php';?>
+</div>
 <?php
-require 'includes/nav.php';
 require 'includes/footer.php';
 ?>
+

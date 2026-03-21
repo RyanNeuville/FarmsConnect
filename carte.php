@@ -93,16 +93,6 @@ require 'includes/header.php';
     </div>
 </div>
 
-<!-- STATUS BAR (Fixed position) -->
-<div class="fixed bottom-20 left-4 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-lg z-[1000]">
-    <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-sm font-medium text-slate-600 dark:text-slate-300">Synchronisation active</span>
-        </div>
-        <div class="text-xs text-slate-400" id="last-map-update">Mis à jour à l'instant</div>
-    </div>
-</div>
 
 <div class="fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white/95 backdrop-blur-sm z-[999]">
 
