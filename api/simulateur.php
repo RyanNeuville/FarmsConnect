@@ -1,15 +1,105 @@
 <?php
-/*
- * Fichier : api/simulateur.php
- * Générateur de données synthétiques (Moteur de simulation).
- * Ce script isolé injecte des variations stochastiques sur l'échantillonnage matériel virtuel 
- * afin d'éprouver la matrice d'alerting et fournir une démonstration temps-réel (Soutenance).
- */
-require_once '../config/db.php';
+/* Point d'entrée pour les requêtes AJAX de simulation */
+if (isset($_GET['ajax'])) {
+    runSimulation($pdo);
+    exit;
+}
 
-echo "<h1>Lancement du simulateur FarmsConnect</h1>";
+function runSimulation($pdo) {
+    /* -- PHASE 1 : Analyse des deltas de mesure par application de bruit aléatoire -- */
+    $stmt = $pdo->query("SELECT * FROM equipements WHERE type = 'capteur'");
+    $capteurs = $stmt->fetchAll();
 
-/* -- PHASE 1 : Analyse des deltas de mesure par application de bruit aléatoire -- */
+    foreach ($capteurs as $capteur) {
+        $changement = mt_rand(-5, 5) / 10;
+        if ($capteur['nom'] === 'Batterie Nord') {
+            $changement = mt_rand(-5, -1) / 10;
+        }
+        
+        $nouvelleValeur = max(0, $capteur['valeur_actuelle'] + $changement);
+        
+        $nouveauStatut = 'normal';
+        $niveauAlerte = null;
+        $messageAlerte = '';
+
+        if ($capteur['seuil_min'] !== null && $nouvelleValeur < $capteur['seuil_min']) {
+            $nouveauStatut = 'critique';
+            $niveauAlerte = 'critique';
+            $messageAlerte = "Valeur anormalement basse (".$nouvelleValeur.$capteur['unite'].") detectée sur ".$capteur['nom'];
+        } elseif ($capteur['seuil_max'] !== null && $nouvelleValeur > $capteur['seuil_max']) {
+            $nouveauStatut = 'critique';
+            $niveauAlerte = 'critique';
+            $messageAlerte = "Valeur anormalement haute (".$nouvelleValeur.$capteur['unite'].") detectée sur ".$capteur['nom'];
+        }
+
+        $pdo->prepare("UPDATE equipements SET valeur_actuelle = ?, statut = ? WHERE id = ?")
+            ->execute([$nouvelleValeur, $nouveauStatut, $capteur['id']]);
+
+        $pdo->prepare("INSERT INTO historique_donnees (equipement_id, valeur) VALUES (?, ?)")
+            ->execute([$capteur['id'], $nouvelleValeur]);
+
+        if ($niveauAlerte && $nouveauStatut !== $capteur['statut']) {
+            $checkAlerte = $pdo->prepare("SELECT id FROM alertes WHERE equipement_id = ? AND cree_le > DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
+            $checkAlerte->execute([$capteur['id']]);
+            if ($checkAlerte->rowCount() == 0) {
+                $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (?, ?, ?)")
+                    ->execute([$capteur['id'], $niveauAlerte, $messageAlerte]);
+            }
+        }
+    }
+
+    if (mt_rand(1, 10) <= 2) {
+        $pdo->prepare("UPDATE equipements SET valeur_actuelle = 1, statut = 'critique' WHERE id = 7")->execute();
+        $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (7, 'critique', 'ALERTE : Intrusion détectée dans la Zone A !')")
+            ->execute();
+    } else {
+        $pdo->prepare("UPDATE equipements SET valeur_actuelle = 0, statut = 'normal' WHERE id = 7")->execute();
+    }
+}
+?>
+<?php
+echo "<!DOCTYPE html><html><head><title>Simulateur FarmsConnect</title>";
+echo "<style>body{font-family:sans-serif; text-align:center; padding:50px; background:#f0fdf4;} .btn{padding:15px 30px; font-weight:bold; cursor:pointer; border-radius:10px; border:none; color:white;} .start{background:#16a34a;} .stop{background:#dc2626; display:none;}</style>";
+echo "</head><body>";
+echo "<h1>Moteur de Simulation FarmsConnect</h1>";
+echo "<p>Ce script met à jour la base de données en temps réel.</p>";
+echo "<button id='toggleBtn' class='btn start'>Démarrer l'Auto-Pilote</button>";
+echo "<button id='stopBtn' class='btn stop'>Arrêter l'Auto-Pilote</button>";
+echo "<div id='status' style='margin-top:20px; font-weight:bold;'>État : En attente...</div>";
+
+echo "<script>
+let interval = null;
+const status = document.getElementById('status');
+const toggleBtn = document.getElementById('toggleBtn');
+const stopBtn = document.getElementById('stopBtn');
+
+function trigger() {
+    fetch('simulateur.php?ajax=1')
+        .then(() => {
+            status.innerText = 'Dernière mise à jour : ' + new Date().toLocaleTimeString();
+            status.style.color = '#16a34a';
+        })
+        .catch(err => console.error(err));
+}
+
+toggleBtn.onclick = () => {
+    interval = setInterval(trigger, 3000);
+    toggleBtn.style.display = 'none';
+    stopBtn.style.display = 'inline-block';
+    status.innerText = 'Auto-Pilote ACTIF (3s)...';
+};
+
+stopBtn.onclick = () => {
+    clearInterval(interval);
+    toggleBtn.style.display = 'inline-block';
+    stopBtn.style.display = 'none';
+    status.innerText = 'Auto-Pilote ARRÊTÉ.';
+    status.style.color = 'black';
+};
+</script></body></html>";
+?>
+<?php
+exit;
 $stmt = $pdo->query("SELECT * FROM equipements WHERE type = 'capteur'");
 $capteurs = $stmt->fetchAll();
 

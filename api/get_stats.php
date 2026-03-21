@@ -24,12 +24,23 @@ try {
     $stmtAlertes = $pdo->query("SELECT COUNT(*) as nb FROM alertes WHERE est_lu = 0");
     $alertesCount = (int)$stmtAlertes->fetch()['nb'];
 
+    /* Récupération des 4 dernières alertes/activités pour le flux dynamique */
+    $stmtRecent = $pdo->query("
+        SELECT a.*, e.nom as equipement_nom, e.icone 
+        FROM alertes a 
+        JOIN equipements e ON a.equipement_id = e.id 
+        ORDER BY a.cree_le DESC 
+        LIMIT 4
+    ");
+    $activites = $stmtRecent->fetchAll();
+
     /* Agrégation de la réponse structurée */
     echo json_encode([
         'status' => 'success',
         'timestamp' => date('H:i'),
         'alertes_count' => $alertesCount,
-        'equipements' => $equipements
+        'equipements' => $equipements,
+        'activites' => $activites
     ]);
 
 } catch (Exception $e) {

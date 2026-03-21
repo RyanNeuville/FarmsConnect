@@ -133,25 +133,9 @@ require 'includes/header.php';
 
       <!-- HISTORIQUE DES CHANGEMENTS D'ÉTAT (RECENT ACTIVITIES) -->
       <h2 class="text-xs font-black text-slate-500 mb-3 uppercase tracking-wider px-1">Activités récentes</h2>
-      <div class="card-border mb-4">
-        <div class="flex justify-between items-center p-4 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <i data-lucide="droplet" class="w-5 h-5 text-blue-500 fill-blue-500/20"></i>
-            <p class="text-[13px] font-bold text-slate-700">Pompe arrosage activée</p>
-          </div>
-          <div class="flex items-center gap-1 text-[11px] font-bold text-slate-400">
-            <i data-lucide="clock" class="w-3 h-3"></i> 08:42
-          </div>
-        </div>
-        <div class="flex justify-between items-center p-4 border-b border-slate-100">
-          <div class="flex items-center gap-3">
-            <i data-lucide="thermometer" class="w-5 h-5 text-red-500"></i>
-            <p class="text-[13px] font-bold text-slate-700">Température serre : 24.2°C</p>
-          </div>
-          <div class="flex items-center gap-1 text-[11px] font-bold text-slate-400">
-            <i data-lucide="clock" class="w-3 h-3"></i> 08:30
-          </div>
-        </div>
+      <div class="card-border mb-4" id="activities-container">
+        <!-- Les activités seront injectées ici par le script JS -->
+        <div class="p-8 text-center text-slate-400 text-xs font-bold">Initialisation du flux...</div>
       </div>
     </main>
 
@@ -237,6 +221,30 @@ function refreshDashboard() {
                         }
                     }
                 });
+
+                // Mise à jour de la section Activités Récentes
+                const activitiesContainer = document.getElementById('activities-container');
+                if (data.activites && data.activites.length > 0) {
+                    let html = '';
+                    data.activites.forEach(act => {
+                        html += `
+                        <div class="flex justify-between items-center p-4 border-b border-slate-100 animate-pulse-quick">
+                          <div class="flex items-center gap-3">
+                            <i data-lucide="${act.icone}" class="w-5 h-5 ${act.niveau === 'critique' ? 'text-red-500' : 'text-blue-500'}"></i>
+                            <p class="text-[13px] font-bold text-slate-700">${act.message}</p>
+                          </div>
+                          <div class="flex items-center gap-1 text-[11px] font-bold text-slate-400">
+                            <i data-lucide="clock" class="w-3 h-3"></i> 
+                            ${new Date(act.cree_le).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </div>
+                        </div>`;
+                    });
+                    activitiesContainer.innerHTML = html;
+                    // On demande à Lucide de re-scanné le nouveau HTML pour générer les icônes SVGs
+                    if (window.lucide) {
+                        lucide.createIcons();
+                    }
+                }
             }
         })
         .catch(err => console.error('Erreur de polling:', err));
