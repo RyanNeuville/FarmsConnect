@@ -72,5 +72,26 @@ foreach ($capteurs as $capteur) {
     }
 }
 
+/* 
+ * -- PHASE EXTRA : Simulation d'événements de sécurité (Intrusion) --
+ * Probabilité d'incident : 20% de chances de déclencher une intrusion lors de l'exécution du script.
+ */
+if (mt_rand(1, 10) <= 2) {
+    echo "<h2 style='color:orange;'>Simulation de sécurité en cours...</h2>";
+    
+    // Détection de mouvement suspect (Equipement ID 7)
+    $valeurMouvement = 1; // 1 = Mouvement détecté
+    $pdo->prepare("UPDATE equipements SET valeur_actuelle = 1, statut = 'critique' WHERE id = 7")->execute();
+    
+    // Génération de l'alerte d'intrusion
+    $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (7, 'critique', 'ALERTE : Intrusion détectée dans la Zone A !')")
+        ->execute();
+        
+    echo "<p style='color:red; font-weight:bold;'>!!! INTRUSION DÉTECTÉE !!!</p>";
+} else {
+    // Réinitialisation du capteur de mouvement si aucune intrusion
+    $pdo->prepare("UPDATE equipements SET valeur_actuelle = 0, statut = 'normal' WHERE id = 7")->execute();
+}
+
 echo "<hr><p>Simulation terminée. Retournez sur <a href='../index.php'>le tableau de bord</a> pour voir les changements.</p>";
 ?>

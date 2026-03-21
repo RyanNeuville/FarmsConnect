@@ -73,4 +73,5 @@ INSERT IGNORE INTO equipements (id, nom, type, unite, valeur_actuelle, statut, s
 (3, 'Réservoir eau', 'capteur', '%', 71.3, 'normal', 20.0, 100.0, 'droplet', 'green'),
 (4, 'Batterie Nord', 'capteur', '%', 87.8, 'normal', 15.0, 100.0, 'battery-medium', 'orange'),
 (5, 'Pompe arrosage', 'actionneur', '', 0, 'arret', NULL, NULL, 'power', 'grey'),
-(6, 'Chauffage serre', 'actionneur', '', 0, 'arret', NULL, NULL, 'flame', 'grey');
+(6, 'Chauffage serre', 'actionneur', '', 0, 'arret', NULL, NULL, 'flame', 'grey'),
+(7, 'Mouvement (Zone A)', 'capteur', '', 0, 'normal', NULL, NULL, 'shield', 'blue');
