@@ -1,187 +1,74 @@
 <?php
-/* Point d'entrée pour les requêtes AJAX de simulation */
-if (isset($_GET['ajax'])) {
-    runSimulation($pdo);
+/*
+ * Fichier : api/simulateur.php
+ * Journal d'activité du moteur de simulation.
+ * Ce fichier est devenu un simple moniteur passif car la simulation est désormais 
+ * pilotée intelligemment par le Dashboard lui-même.
+ */
+require_once '../config/db.php';
+require_once '../includes/auth.php';
+
+if (!est_connecte()) {
+    header('Location: ../login.php');
     exit;
 }
 
-function runSimulation($pdo) {
-    /* -- PHASE 1 : Analyse des deltas de mesure par application de bruit aléatoire -- */
-    $stmt = $pdo->query("SELECT * FROM equipements WHERE type = 'capteur'");
-    $capteurs = $stmt->fetchAll();
-
-    foreach ($capteurs as $capteur) {
-        $changement = mt_rand(-5, 5) / 10;
-        if ($capteur['nom'] === 'Batterie Nord') {
-            $changement = mt_rand(-5, -1) / 10;
-        }
-        
-        $nouvelleValeur = max(0, $capteur['valeur_actuelle'] + $changement);
-        
-        $nouveauStatut = 'normal';
-        $niveauAlerte = null;
-        $messageAlerte = '';
-
-        if ($capteur['seuil_min'] !== null && $nouvelleValeur < $capteur['seuil_min']) {
-            $nouveauStatut = 'critique';
-            $niveauAlerte = 'critique';
-            $messageAlerte = "Valeur anormalement basse (".$nouvelleValeur.$capteur['unite'].") detectée sur ".$capteur['nom'];
-        } elseif ($capteur['seuil_max'] !== null && $nouvelleValeur > $capteur['seuil_max']) {
-            $nouveauStatut = 'critique';
-            $niveauAlerte = 'critique';
-            $messageAlerte = "Valeur anormalement haute (".$nouvelleValeur.$capteur['unite'].") detectée sur ".$capteur['nom'];
-        }
-
-        $pdo->prepare("UPDATE equipements SET valeur_actuelle = ?, statut = ? WHERE id = ?")
-            ->execute([$nouvelleValeur, $nouveauStatut, $capteur['id']]);
-
-        $pdo->prepare("INSERT INTO historique_donnees (equipement_id, valeur) VALUES (?, ?)")
-            ->execute([$capteur['id'], $nouvelleValeur]);
-
-        if ($niveauAlerte && $nouveauStatut !== $capteur['statut']) {
-            $checkAlerte = $pdo->prepare("SELECT id FROM alertes WHERE equipement_id = ? AND cree_le > DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
-            $checkAlerte->execute([$capteur['id']]);
-            if ($checkAlerte->rowCount() == 0) {
-                $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (?, ?, ?)")
-                    ->execute([$capteur['id'], $niveauAlerte, $messageAlerte]);
-            }
-        }
-    }
-
-    if (mt_rand(1, 10) <= 2) {
-        $pdo->prepare("UPDATE equipements SET valeur_actuelle = 1, statut = 'critique' WHERE id = 7")->execute();
-        $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (7, 'critique', 'ALERTE : Intrusion détectée dans la Zone A !')")
-            ->execute();
-    } else {
-        $pdo->prepare("UPDATE equipements SET valeur_actuelle = 0, statut = 'normal' WHERE id = 7")->execute();
-    }
-}
+$page_title = 'Moniteur de Simulation';
+require_once '../includes/header.php';
 ?>
-<?php
-echo "<!DOCTYPE html><html><head><title>Simulateur FarmsConnect</title>";
-echo "<style>body{font-family:sans-serif; text-align:center; padding:50px; background:#f0fdf4;} .btn{padding:15px 30px; font-weight:bold; cursor:pointer; border-radius:10px; border:none; color:white;} .start{background:#16a34a;} .stop{background:#dc2626; display:none;}</style>";
-echo "</head><body>";
-echo "<h1>Moteur de Simulation FarmsConnect</h1>";
-echo "<p>Ce script met à jour la base de données en temps réel.</p>";
-echo "<button id='toggleBtn' class='btn start'>Démarrer l'Auto-Pilote</button>";
-echo "<button id='stopBtn' class='btn stop'>Arrêter l'Auto-Pilote</button>";
-echo "<div id='status' style='margin-top:20px; font-weight:bold;'>État : En attente...</div>";
 
-echo "<script>
-let interval = null;
-const status = document.getElementById('status');
-const toggleBtn = document.getElementById('toggleBtn');
-const stopBtn = document.getElementById('stopBtn');
+<div class="p-6">
+    <div class="flex items-center gap-4 mb-8">
+        <a href="../index.php" class="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 shadow-sm">
+            <i data-lucide="chevron-left" class="w-6 h-6"></i>
+        </a>
+        <h1 class="text-2xl font-black text-brand-dark">Moniteur de Simulation</h1>
+    </div>
 
-function trigger() {
-    fetch('simulateur.php?ajax=1')
-        .then(() => {
-            status.innerText = 'Dernière mise à jour : ' + new Date().toLocaleTimeString();
-            status.style.color = '#16a34a';
-        })
-        .catch(err => console.error(err));
-}
+    <div class="bg-brand-green-light border border-brand-green rounded-2xl p-6 mb-6 text-center">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center text-green-600 mx-auto mb-4">
+            <i data-lucide="cpu" class="w-10 h-10"></i>
+        </div>
+        <h2 class="text-xl font-black text-green-700 mb-2">Auto-Pilote Intelligent Actif</h2>
+        <p class="text-sm text-green-600 font-bold max-w-xs mx-auto">
+            Le moteur de simulation est désormais synchronisé avec ton Dashboard. 
+            Il tourne silencieusement en arrière-plan toutes les 5 secondes.
+        </p>
+    </div>
 
-toggleBtn.onclick = () => {
-    interval = setInterval(trigger, 3000);
-    toggleBtn.style.display = 'none';
-    stopBtn.style.display = 'inline-block';
-    status.innerText = 'Auto-Pilote ACTIF (3s)...';
-};
+    <h2 class="text-xs font-black text-slate-500 mb-3 uppercase tracking-wider px-1">Derniers événements injectés</h2>
+    <div class="card-border bg-white overflow-hidden">
+        <?php
+        $stmt = $pdo->query("SELECT a.*, e.nom as equip_nom FROM alertes a JOIN equipements e ON a.equipement_id = e.id ORDER BY a.cree_le DESC LIMIT 10");
+        $logs = $stmt->fetchAll();
 
-stopBtn.onclick = () => {
-    clearInterval(interval);
-    toggleBtn.style.display = 'inline-block';
-    stopBtn.style.display = 'none';
-    status.innerText = 'Auto-Pilote ARRÊTÉ.';
-    status.style.color = 'black';
-};
-</script></body></html>";
-?>
-<?php
-exit;
-$stmt = $pdo->query("SELECT * FROM equipements WHERE type = 'capteur'");
-$capteurs = $stmt->fetchAll();
+        if (empty($logs)): ?>
+            <div class="p-10 text-center text-slate-400 font-bold">Aucune activité récente détectée.</div>
+        <?php else:
+            foreach ($logs as $log): ?>
+                <div class="flex justify-between items-center p-4 border-b border-slate-50">
+                    <div>
+                        <p class="text-[13px] font-black <?= $log['niveau'] === 'critique' ? 'text-red-600' : 'text-slate-800' ?>">
+                            <?= htmlspecialchars($log['message']) ?>
+                        </p>
+                        <p class="text-[10px] text-slate-400 font-bold"><?= $log['cree_le'] ?></p>
+                    </div>
+                    <div class="icon-box <?= $log['niveau'] === 'critique' ? 'red' : 'green' ?> scale-75">
+                        <i data-lucide="<?= $log['niveau'] === 'critique' ? 'alert-triangle' : 'info' ?>" class="w-5 h-5"></i>
+                    </div>
+                </div>
+            <?php endforeach; 
+        endif; ?>
+    </div>
 
-foreach ($capteurs as $capteur) {
-    /* Application d'une dérive stochastique modérée (amplitude : ±0.5 unité de mesure) */
-    $changement = mt_rand(-5, 5) / 10;
-    
-    /* Scénario d'exception : L'accumulateur d'énergie subit un déchargement asymétrique exclusif */
-    if ($capteur['nom'] === 'Batterie Nord') {
-        $changement = mt_rand(-5, -1) / 10;
-    }
-    
-    $nouvelleValeur = max(0, $capteur['valeur_actuelle'] + $changement);
-    
-    /* -- PHASE 2 : Évaluation conditionnelle contre la table de vérité des seuils -- */
-    $nouveauStatut = 'normal';
-    $niveauAlerte = null;
-    $messageAlerte = '';
+    <div class="mt-8 p-4 bg-slate-100 rounded-xl border border-dashed border-slate-300">
+        <p class="text-[11px] text-slate-500 font-bold leading-relaxed">
+            Note technique : La simulation est déclenchée par le fichier <code>api/get_stats.php</code> 
+            via la fonction <code>runSimulationEngine()</code>. Plus de bouton manuel requis.
+        </p>
+    </div>
+</div>
 
-    if ($capteur['seuil_min'] !== null && $nouvelleValeur < $capteur['seuil_min']) {
-        $nouveauStatut = 'critique';
-        $niveauAlerte = 'critique';
-        $messageAlerte = "Valeur anormalement basse (".$nouvelleValeur.$capteur['unite'].") detectée sur ".$capteur['nom'];
-    } elseif ($capteur['seuil_max'] !== null && $nouvelleValeur > $capteur['seuil_max']) {
-        $nouveauStatut = 'critique';
-        $niveauAlerte = 'critique';
-        $messageAlerte = "Valeur anormalement haute (".$nouvelleValeur.$capteur['unite'].") detectée sur ".$capteur['nom'];
-    } elseif ($capteur['seuil_min'] !== null && $nouvelleValeur < ($capteur['seuil_min'] + ($capteur['seuil_min']*0.1))) {
-        /* Seuil d'avertissement anticipatif à ±10% de tolérance du seuil d'intervention physique */
-        $nouveauStatut = 'alerte';
-        $niveauAlerte = 'important';
-        $messageAlerte = "Attention, valeur proche du minimum sur ".$capteur['nom'];
-    }
-
-    /* Synchonisation de l'état nominal de la métrique en base */
-    $pdo->prepare("UPDATE equipements SET valeur_actuelle = ?, statut = ? WHERE id = ?")
-        ->execute([$nouvelleValeur, $nouveauStatut, $capteur['id']]);
-        
-    echo "<p>{$capteur['nom']} : {$capteur['valeur_actuelle']} -> {$nouvelleValeur} ({$nouveauStatut})</p>";
-
-    /* Persistance de l'échantillon pour analyse de série temporelle (Graphique analytique) */
-    $pdo->prepare("INSERT INTO historique_donnees (equipement_id, valeur) VALUES (?, ?)")
-        ->execute([$capteur['id'], $nouvelleValeur]);
-
-    /* 
-     * -- PHASE 3 : Dispatching intelligent des incidents --
-     * Modèle de rate-limiting basique : bloque l'émission d'une nouvelle notification matérielle 
-     * identique durant une fenêtre de throttling (5 minutes).
-     */
-    if ($niveauAlerte && $nouveauStatut !== $capteur['statut']) {
-        /* Vérification du cache du système d'événements pour l'amortissement des alertes */
-        $checkAlerte = $pdo->prepare("SELECT id FROM alertes WHERE equipement_id = ? AND cree_le > DATE_SUB(NOW(), INTERVAL 5 MINUTE)");
-        $checkAlerte->execute([$capteur['id']]);
-        
-        if ($checkAlerte->rowCount() == 0) {
-            $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (?, ?, ?)")
-                ->execute([$capteur['id'], $niveauAlerte, $messageAlerte]);
-            echo "<p style='color:red;'>=> Alerte générée !</p>";
-        }
-    }
-}
-
-/* 
- * -- PHASE EXTRA : Simulation d'événements de sécurité (Intrusion) --
- * Probabilité d'incident : 20% de chances de déclencher une intrusion lors de l'exécution du script.
- */
-if (mt_rand(1, 10) <= 2) {
-    echo "<h2 style='color:orange;'>Simulation de sécurité en cours...</h2>";
-    
-    // Détection de mouvement suspect (Equipement ID 7)
-    $valeurMouvement = 1; // 1 = Mouvement détecté
-    $pdo->prepare("UPDATE equipements SET valeur_actuelle = 1, statut = 'critique' WHERE id = 7")->execute();
-    
-    // Génération de l'alerte d'intrusion
-    $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (7, 'critique', 'ALERTE : Intrusion détectée dans la Zone A !')")
-        ->execute();
-        
-    echo "<p style='color:red; font-weight:bold;'>!!! INTRUSION DÉTECTÉE !!!</p>";
-} else {
-    // Réinitialisation du capteur de mouvement si aucune intrusion
-    $pdo->prepare("UPDATE equipements SET valeur_actuelle = 0, statut = 'normal' WHERE id = 7")->execute();
-}
-
-echo "<hr><p>Simulation terminée. Retournez sur <a href='../index.php'>le tableau de bord</a> pour voir les changements.</p>";
+<?php 
+require_once '../includes/footer.php';
 ?>

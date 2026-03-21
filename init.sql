@@ -75,3 +75,18 @@ INSERT IGNORE INTO equipements (id, nom, type, unite, valeur_actuelle, statut, s
 (5, 'Pompe arrosage', 'actionneur', '', 0, 'arret', NULL, NULL, 'power', 'grey'),
 (6, 'Chauffage serre', 'actionneur', '', 0, 'arret', NULL, NULL, 'flame', 'grey'),
 (7, 'Mouvement (Zone A)', 'capteur', '', 0, 'normal', NULL, NULL, 'shield', 'blue');
+
+-- 6. Peuplement historique (Simulation d'activité sur les dernières 24h)
+INSERT IGNORE INTO historique_donnees (equipement_id, valeur, enregistre_le) VALUES 
+(1, 18.5, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+(1, 19.2, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+(1, 20.1, DATE_SUB(NOW(), INTERVAL 30 MINUTE)),
+(2, 60.5, DATE_SUB(NOW(), INTERVAL 3 HOUR)),
+(2, 62.1, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+(2, 65.4, DATE_SUB(NOW(), INTERVAL 1 HOUR)),
+(3, 85.0, DATE_SUB(NOW(), INTERVAL 4 HOUR)),
+(3, 82.3, DATE_SUB(NOW(), INTERVAL 3 HOUR)),
+(3, 78.1, DATE_SUB(NOW(), INTERVAL 2 HOUR)),
+(4, 98.0, DATE_SUB(NOW(), INTERVAL 10 HOUR)),
+(4, 95.5, DATE_SUB(NOW(), INTERVAL 5 HOUR)),
+(4, 92.1, DATE_SUB(NOW(), INTERVAL 1 HOUR));

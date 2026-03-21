@@ -7,6 +7,7 @@
 header('Content-Type: application/json');
 require_once '../config/db.php';
 require_once '../includes/auth.php';
+require_once '../includes/simulation_engine.php';
 
 /* Sécurisation de l'accès API : La session doit être active pour consommer les données */
 if (!est_connecte()) {
@@ -14,6 +15,13 @@ if (!est_connecte()) {
     echo json_encode(['error' => 'Non authentifié']);
     exit;
 }
+
+/* 
+ * DÉCLENCHEMENT DE L'INTELLIGENCE AMBIANTE (Simulation invisible)
+ * Le moteur s'exécute silencieusement en arrière-plan à chaque appel 
+ * si le cooldown de 5 secondes est expiré.
+ */
+runSimulationEngine($pdo);
 
 try {
     /* Extraction des métriques actuelles de tous les équipements */
