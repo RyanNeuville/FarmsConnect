@@ -46,139 +46,103 @@ $active_nav = 'carte';
 require 'includes/header.php';
 ?>
 
-<!-- Header -->
+<!-- HEADER -->
 <header class="flex justify-between items-start mt-4 mb-6 px-4">
     <div class="flex items-center gap-2">
-        <div class="w-10 h-10 bg-brand-green-light border border-brand-green rounded-[14px] flex items-center justify-center">
+        <div class="w-10 h-10 bg-green-100 border border-green-200 rounded-[14px] flex items-center justify-center text-green-600">
             <img src="assets/icon.png" alt="FarmsConnect Logo" class="w-6 h-6" />
         </div>
         <div>
-            <h1 class="text-[1.1rem] font-black text-brand-dark dark:text-white">Carte</h1>
-            <p class="text-xs text-slate-400">Vue d'ensemble de la ferme</p>
+            <h1 class="text-[1.1rem] font-black text-slate-800 dark:text-white leading-tight">Carte</h1>
+            <p class="text-xs text-slate-400 font-bold">Vue d'ensemble de la ferme</p>
         </div>
     </div>
 </header>
 
-<!-- Map Container -->
-<div id="map" class="card-border mx-4 mb-4" style="height: calc(100vh - 180px);"></div>
+<!-- MAP CONTAINER -->
+<div id="map" class="card-border mx-4 mb-4 rounded-2xl overflow-hidden" style="height: calc(100vh - 180px);"></div>
 
-<!-- Legend -->
-<div class="legend fixed top-20 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-lg z-[1000] max-w-[200px]">
-    <h4 class="font-semibold text-sm mb-2 text-slate-800 dark:text-white">Légende</h4>
+<!-- LEGEND (Fixed position) -->
+<div class="fixed top-24 right-3 bg-white/95 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 shadow-2xl z-[1000] max-w-[220px] backdrop-blur-sm">
+    <h4 class="font-bold text-sm mb-3 text-slate-800 dark:text-white">Légende</h4>
     <div class="space-y-2">
-        <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-4 h-4 rounded-full bg-green-500 border-2 border-white shadow-sm"></div>
             <span class="text-xs text-slate-600 dark:text-slate-300">Capteur normal</span>
         </div>
-        <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-4 h-4 rounded-full bg-orange-500 border-2 border-white shadow-sm"></div>
             <span class="text-xs text-slate-600 dark:text-slate-300">Capteur alerte</span>
         </div>
-        <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-sm"></div>
             <span class="text-xs text-slate-600 dark:text-slate-300">Capteur critique</span>
         </div>
-        <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow-sm"></div>
             <span class="text-xs text-slate-600 dark:text-slate-300">Détecteur mouvement</span>
         </div>
-        <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-gray-500"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-4 h-4 rounded-full bg-gray-500 border-2 border-white shadow-sm"></div>
             <span class="text-xs text-slate-600 dark:text-slate-300">Actionneur arrêté</span>
         </div>
-        <div class="flex items-center gap-2">
-            <div class="w-3 h-3 rounded-full bg-green-600"></div>
+        <div class="flex items-center gap-3">
+            <div class="w-4 h-4 rounded-full bg-green-600 border-2 border-white shadow-sm"></div>
             <span class="text-xs text-slate-600 dark:text-slate-300">Actionneur en marche</span>
         </div>
     </div>
 </div>
 
-<!-- Status Bar -->
-<div id="map-status" class="fixed bottom-20 left-4 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-lg z-[1000]">
+<!-- STATUS BAR (Fixed position) -->
+<div class="fixed bottom-20 left-4 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-4 shadow-lg z-[1000]">
     <div class="flex items-center justify-between">
-        <div class="flex items-center gap-2">
-            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-            <span class="text-xs font-medium text-slate-600 dark:text-slate-300">Synchronisation active</span>
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="text-sm font-medium text-slate-600 dark:text-slate-300">Synchronisation active</span>
         </div>
         <div class="text-xs text-slate-400" id="last-map-update">Mis à jour à l'instant</div>
     </div>
 </div>
 
-<?php require 'includes/footer.php'; ?>
+<div class="fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white/95 backdrop-blur-sm z-[999]">
 
-<!-- Leaflet CSS -->
+<!-- Spacer for bottom nav -->
+    <?php 
+require 'includes/nav.php'; ?>
+</div>
+<?php
+require 'includes/footer.php';
+?>
+
+<!-- LEAFLET CSS -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""/>
 
-<!-- Custom Map Styles -->
+<!-- LEAFLET POPUP STYLES -->
 <style>
-    .equipment-marker {
-        border-radius: 50%;
-        border: 2px solid white;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 11px;
-        width: 28px;
-        height: 28px;
-    }
-
-    .equipment-popup {
-        min-width: 180px;
-        font-size: 14px;
-    }
-
-    .equipment-popup h3 {
-        margin: 0 0 6px 0;
-        font-size: 14px;
-        font-weight: 600;
-    }
-
-    .equipment-popup .status {
-        display: inline-block;
-        padding: 2px 6px;
-        border-radius: 8px;
-        font-size: 10px;
-        font-weight: 500;
-        margin-bottom: 6px;
-    }
-
-    .equipment-popup .value {
-        font-size: 16px;
-        font-weight: 700;
-        margin: 4px 0;
-    }
-
     .leaflet-popup-content-wrapper {
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        font-family: inherit;
     }
 
     .leaflet-popup-tip {
         background-color: white;
     }
 
-    /* Dark mode support for map */
-    html.dark .legend {
+    /* Dark mode support for Leaflet popups */
+    html.dark .leaflet-popup-content-wrapper {
         background-color: rgb(30 41 59);
-        border-color: rgb(51 65 85);
+        color: rgb(241 245 249);
     }
 
-    html.dark .legend h4 {
-        color: white;
-    }
-
-    html.dark #map-status {
+    html.dark .leaflet-popup-tip {
         background-color: rgb(30 41 59);
-        border-color: rgb(51 65 85);
     }
 </style>
 
-<!-- Leaflet JS -->
+<!-- LEAFLET JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
@@ -269,7 +233,7 @@ require 'includes/header.php';
 
             // Create custom marker
             const markerHtml = `
-                <div class="equipment-marker" style="background-color: ${color}">
+                <div class="rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white font-bold text-xs w-7 h-7" style="background-color: ${color}">
                     ${icon}
                 </div>
             `;
@@ -287,29 +251,29 @@ require 'includes/header.php';
 
             // Create popup content
             let popupContent = `
-                <div class="equipment-popup">
-                    <h3>${equipement.nom}</h3>
-                    <span class="status" style="background-color: ${color}20; color: ${color}; border: 1px solid ${color}40;">
+                <div class="min-w-[180px] text-sm font-sans">
+                    <h3 class="m-0 mb-1.5 text-sm font-semibold text-slate-800 dark:text-slate-100">${equipement.nom}</h3>
+                    <span class="inline-block px-1.5 py-0.5 rounded-lg text-[10px] font-medium mb-1.5" style="background-color: ${color}20; color: ${color}; border: 1px solid ${color}40;">
                         ${equipement.statut.charAt(0).toUpperCase() + equipement.statut.slice(1)}
                     </span>
             `;
 
             if (equipement.type === 'capteur') {
                 popupContent += `
-                    <div class="value" style="color: ${color}">
+                    <div class="text-base font-bold my-1 text-slate-800 dark:text-slate-100" style="color: ${color}">
                         ${equipement.valeur_actuelle} ${equipement.unite}
                     </div>
                 `;
             } else {
                 popupContent += `
-                    <div class="value" style="color: ${color}">
+                    <div class="text-base font-bold my-1 text-slate-800 dark:text-slate-100" style="color: ${color}">
                         ${equipement.statut === 'marche' ? 'En marche' : 'Arrêté'}
                     </div>
                 `;
             }
 
             popupContent += `
-                    <div class="text-xs text-gray-600 mt-2">
+                    <div class="text-xs text-gray-600 dark:text-gray-400 mt-2">
                         Type: ${equipement.type}<br>
                         ID: ${equipement.id}
                     </div>
