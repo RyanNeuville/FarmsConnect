@@ -8,6 +8,7 @@ header('Content-Type: application/json');
 require_once '../config/db.php';
 require_once '../includes/auth.php';
 require_once '../includes/simulation_engine.php';
+require_once '../includes/functions.php';
 
 /* Sécurisation de l'accès API : La session doit être active pour consommer les données */
 if (!est_connecte()) {
