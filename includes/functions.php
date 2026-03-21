@@ -46,11 +46,11 @@ function getStatusBadge($statut) {
  * @param string $statut L'état d'opérabilité courant ('marche' ou 'arret')
  * @return string Le code markup configuré du bouton de soumission
  */
-function getActionButton($statut) {
+function getActionButton($statut, $id = 0) {
     if ($statut === 'marche') {
-        return '<button type="submit" name="action" value="0" class="bg-green-100 text-green-700 font-black text-xs py-2.5 rounded-xl w-full flex items-center justify-center gap-1 shadow-sm border border-green-200"><span class="w-[6px] h-[6px] rounded-full bg-green-500 block"></span> MARCHE</button>';
+        return '<button type="button" data-id="'.$id.'" data-action="0" class="actuator-btn bg-green-100 text-green-700 font-black text-xs py-2.5 rounded-xl w-full flex items-center justify-center gap-1 shadow-sm border border-green-200"><span class="w-[6px] h-[6px] rounded-full bg-green-500 block"></span> MARCHE</button>';
     } else {
-        return '<button type="submit" name="action" value="1" class="bg-slate-200 text-slate-600 font-black text-xs py-2.5 rounded-xl w-full flex items-center justify-center gap-1 shadow-sm"><span class="w-[6px] h-[6px] rounded-full border border-slate-400 bg-transparent block"></span> ARRÊT</button>';
+        return '<button type="button" data-id="'.$id.'" data-action="1" class="actuator-btn bg-slate-200 text-slate-600 font-black text-xs py-2.5 rounded-xl w-full flex items-center justify-center gap-1 shadow-sm"><span class="w-[6px] h-[6px] rounded-full border border-slate-400 bg-transparent block"></span> ARRÊT</button>';
     }
 }
 
@@ -84,5 +84,27 @@ function formatDate($dateStr) {
     } catch (Exception $e) {
         return $dateStr;
     }
+}
+/**
+ * Simule des données météo en fonction de l'heure actuelle (cycle circadien).
+ * Température plus basse la nuit, pic en milieu d'après-midi.
+ * 
+ * @return array ['temp', 'condition', 'icon']
+ */
+function simulateWeather() {
+    $hour = (int)date('H');
+    
+    // Courbe sinusoïdale simple : Min à 4h, Max à 16h
+    // Moyenne 21°C, Amplitude +/- 7°C
+    $tempBase = 21 + 7 * sin(($hour - 10) * pi() / 12);
+    $temp = round($tempBase + (mt_rand(-5, 5) / 10), 1); // Petite variation aléatoire
+    
+    $isNight = ($hour > 19 || $hour < 7);
+    
+    return [
+        'temp' => $temp . '°C',
+        'condition' => $isNight ? 'Nuit étoilée' : ($temp > 25 ? 'Chaleur intense' : 'Ensoleillé'),
+        'icon' => $isNight ? 'moon' : 'sun'
+    ];
 }
 ?>

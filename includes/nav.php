@@ -71,6 +71,14 @@ function getNavIconClass($item, $active, $baseIcons) {
           </a>
         </li>
         <li>
+          <a href="rapports.php" class="<?= getNavClass('rapports', $active_nav) ?>">
+            <?= getNavInnerContainer('rapports', $active_nav) ?>
+              <i data-lucide="bar-chart-2" class="<?= getNavIconClass('rapports', $active_nav, 'w-5 h-5') ?>"></i>
+            </div>
+            <span>Rapports</span>
+          </a>
+        </li>
+        <li>
           <a href="equipements.php" class="<?= getNavClass('equipements', $active_nav) ?>">
             <?= getNavInnerContainer('equipements', $active_nav) ?>
               <i data-lucide="tractor" class="<?= getNavIconClass('equipements', $active_nav, 'w-5 h-5') ?>"></i>

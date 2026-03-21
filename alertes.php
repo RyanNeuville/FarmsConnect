@@ -41,13 +41,31 @@ require 'includes/header.php';
 ?>
 
       <!-- HEADER -->
-      <header class="flex items-center gap-3 mt-4 mb-6">
-        <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
-          <i data-lucide="bell" class="w-6 h-6"></i>
+      <header class="flex justify-between items-center mt-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
+            <i data-lucide="bell" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-[1.3rem] font-black text-brand-dark dark:text-white leading-tight">Alertes</h1>
+            <p class="text-xs text-slate-400 font-bold"><?= $nonLues ?> non lues</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-[1.3rem] font-black text-[#0f2b46] leading-tight">Alertes</h1>
-          <p class="text-xs text-slate-400 font-bold"><?= $nonLues ?> non lues</p>
+        
+        <div class="flex gap-2">
+          <?php if ($nonLues > 0): ?>
+          <button onclick="markAllRead()" class="w-10 h-10 bg-white dark:bg-slate-800 card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-green-500 transition-colors" title="Tout lire">
+            <i data-lucide="check-check" class="w-5 h-5"></i>
+          </button>
+          <?php endif; ?>
+          <?php if (!empty($alertes)): ?>
+          <button onclick="deleteAllAlerts()" class="w-10 h-10 bg-white dark:bg-slate-800 card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors" title="Tout supprimer">
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
+          </button>
+          <?php endif; ?>
+          <a href="logout.php" class="w-10 h-10 bg-white card-border rounded-xl flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors" title="Déconnexion">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </a>
         </div>
       </header>
 
@@ -61,7 +79,7 @@ require 'includes/header.php';
 
         <div class="space-y-3">
           <?php foreach ($critiques as $alerte): ?>
-          <div class="bg-white rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] border border-slate-100 border-l-4 border-l-red-500 p-4 relative <?= $alerte['est_lu'] ? 'opacity-60' : '' ?>">
+          <div class="bg-white dark:bg-slate-800/50 rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] border border-slate-100 dark:border-slate-700 border-l-4 border-l-red-500 p-4 relative <?= $alerte['est_lu'] ? 'opacity-60' : '' ?>">
             <?php if (!$alerte['est_lu']): ?>
             <a href="api/read_alert.php?id=<?= $alerte['id'] ?>" class="absolute top-3 right-3 text-slate-300 hover:text-red-500">
               <i data-lucide="x" class="w-4 h-4"></i>
@@ -74,7 +92,7 @@ require 'includes/header.php';
               <div class="flex-1">
                 <div class="flex items-center gap-1.5 mb-1">
                   <?php if (!$alerte['est_lu']): ?><span class="w-2.5 h-2.5 rounded-full bg-red-500"></span><?php endif; ?>
-                  <h3 class="text-sm font-bold text-[#0f2b46]"><?= htmlspecialchars($alerte['equipement_nom']) ?></h3>
+                  <h3 class="text-sm font-bold text-brand-dark dark:text-white"><?= htmlspecialchars($alerte['equipement_nom']) ?></h3>
                 </div>
                 <p class="text-[11px] text-slate-500 font-semibold mb-3"><?= htmlspecialchars($alerte['message']) ?></p>
 
@@ -109,7 +127,7 @@ require 'includes/header.php';
 
         <div class="space-y-3">
           <?php foreach ($importantes as $alerte): ?>
-          <div class="bg-white rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] border border-slate-100 border-l-4 border-l-orange-400 p-4 relative <?= $alerte['est_lu'] ? 'opacity-60' : '' ?>">
+          <div class="bg-white dark:bg-slate-800/50 rounded-xl shadow-[0_2px_4px_rgba(0,0,0,0.02)] border border-slate-100 dark:border-slate-700 border-l-4 border-l-orange-400 p-4 relative <?= $alerte['est_lu'] ? 'opacity-60' : '' ?>">
             <?php if (!$alerte['est_lu']): ?>
             <a href="api/read_alert.php?id=<?= $alerte['id'] ?>" class="absolute top-3 right-3 text-slate-300 hover:text-orange-500">
               <i data-lucide="x" class="w-4 h-4"></i>
@@ -122,7 +140,7 @@ require 'includes/header.php';
               <div class="flex-1">
                 <div class="flex items-center gap-1.5 mb-1">
                   <?php if (!$alerte['est_lu']): ?><span class="w-2.5 h-2.5 rounded-full bg-orange-400"></span><?php endif; ?>
-                  <h3 class="text-sm font-bold text-[#0f2b46]"><?= htmlspecialchars($alerte['equipement_nom']) ?></h3>
+                  <h3 class="text-sm font-bold text-brand-dark dark:text-white"><?= htmlspecialchars($alerte['equipement_nom']) ?></h3>
                 </div>
                 <p class="text-[11px] text-slate-500 font-semibold mb-3"><?= htmlspecialchars($alerte['message']) ?></p>
 
@@ -159,3 +177,28 @@ require 'includes/header.php';
 require 'includes/nav.php';
 require 'includes/footer.php';
 ?>
+<script>
+function markAllRead() {
+    fetch('api/manage_alerts.php?action=mark_all_read')
+    .then(res => res.json())
+    .then(data => {
+        showToast(data.message || 'Alertes marquées comme lues', 'success');
+        setTimeout(() => location.reload(), 1500);
+    });
+}
+
+function deleteAllAlerts() {
+    showConfirm('Voulez-vous vraiment vider tout le journal des alertes ?', () => {
+        fetch('api/manage_alerts.php?action=delete_all')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                showToast('Journal des alertes vidé avec succès', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast('Erreur lors de la suppression', 'error');
+            }
+        });
+    });
+}
+</script>

@@ -9,6 +9,15 @@ require_once 'includes/auth.php';
 
 forcer_connexion();
 
+// Informations Utilisateur
+$user_nom   = $_SESSION['user_nom']   ?? 'Utilisateur';
+$user_email = $_SESSION['user_email'] ?? 'administrateur@farmsconnect.com';
+$user_role  = 'Super Administrateur';
+
+// Chargement des paramètres système
+$stmtS = $pdo->query("SELECT valeur FROM parametres_systeme WHERE cle = 'vitesse_simulation'");
+$vitesse_actuelle = $stmtS->fetchColumn() ?: '1.0';
+
 $message_succes = '';
 
 /* Interception et traitement du flux POST lors de la soumission du formulaire de configuration */
@@ -50,12 +59,37 @@ $active_nav = 'reglages';
 require 'includes/header.php';
 ?>
       <!-- HEADER -->
-      <header class="flex items-center gap-3 mt-4 mb-6">
-        <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600">
-          <i data-lucide="settings" class="w-6 h-6"></i>
+      <header class="flex justify-between items-center mt-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600">
+            <i data-lucide="settings" class="w-6 h-6"></i>
+          </div>
+          <div><h1 class="text-[1.3rem] font-black text-brand-dark dark:text-white leading-tight">Réglages</h1></div>
         </div>
-        <div><h1 class="text-[1.3rem] font-black text-[#0f2b46] leading-tight">Réglages</h1></div>
+        <form action="logout.php" method="POST">
+            <button type="submit" class="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-red-500 shadow-sm" title="Déconnexion">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+        </form>
       </header>
+
+      <!-- SECTION MON PROFIL -->
+      <div class="card-border p-5 mb-8 bg-gradient-to-br from-[#0f2b46] to-[#1a3b5c] text-white relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="flex items-center gap-5 relative z-10">
+          <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 shadow-xl">
+             <i data-lucide="user" class="w-8 h-8 text-white"></i>
+          </div>
+          <div class="flex-1">
+            <h2 class="text-lg font-black leading-tight"><?= htmlspecialchars($user_nom) ?></h2>
+            <p class="text-[11px] text-white/70 font-bold"><?= htmlspecialchars($user_email) ?></p>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] font-black uppercase tracking-wider rounded-md border border-green-500/30">En ligne</span>
+                <span class="px-2 py-0.5 bg-white/10 text-white/80 text-[9px] font-black uppercase tracking-wider rounded-md border border-white/20"><?= $user_role ?></span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <?php if (!empty($message_succes)): ?>
       <div class="bg-green-50 text-green-600 font-bold p-3 rounded-xl mb-4 text-sm flex items-center gap-2 border border-green-200">
@@ -67,12 +101,12 @@ require 'includes/header.php';
       <div class="card-border p-4 mb-6">
         <div class="flex items-center gap-2 mb-4">
           <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-500"><i data-lucide="bell" class="w-3.5 h-3.5"></i></div>
-          <h3 class="font-bold text-[#0f2b46] text-sm">Notifications</h3>
+          <h3 class="font-bold text-brand-dark dark:text-white text-sm">Notifications</h3>
         </div>
 
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h4 class="font-bold text-sm text-[#0f2b46]">Activer les alertes</h4>
+            <h4 class="font-bold text-sm text-brand-dark dark:text-white">Activer les alertes</h4>
             <p class="text-[11px] text-slate-400 font-bold">Recevoir les notifications push</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
@@ -89,7 +123,7 @@ require 'includes/header.php';
           <div class="card-border p-4 mb-3">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-orange-100 rounded-md flex items-center justify-center text-orange-500"><i data-lucide="thermometer" class="w-3.5 h-3.5"></i></div>
-              <h3 class="font-bold text-[#0f2b46] text-sm">Température serre</h3>
+              <h3 class="font-bold text-brand-dark dark:text-white text-sm">Température serre</h3>
             </div>
             <div class="flex gap-4">
               <div class="flex-1">
@@ -107,7 +141,7 @@ require 'includes/header.php';
           <div class="card-border p-4 mb-3">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-blue-100 rounded-md flex items-center justify-center text-blue-500"><i data-lucide="droplets" class="w-3.5 h-3.5"></i></div>
-              <h3 class="font-bold text-[#0f2b46] text-sm">Humidité sol</h3>
+              <h3 class="font-bold text-brand-dark dark:text-white text-sm">Humidité sol</h3>
             </div>
             <div class="flex gap-4">
               <div class="flex-1">
@@ -125,7 +159,7 @@ require 'includes/header.php';
           <div class="card-border p-4 mb-3">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-cyan-100 rounded-md flex items-center justify-center text-cyan-500"><i data-lucide="droplet" class="w-3.5 h-3.5"></i></div>
-              <h3 class="font-bold text-[#0f2b46] text-sm">Niveau eau</h3>
+              <h3 class="font-bold text-brand-dark dark:text-white text-sm">Niveau eau</h3>
             </div>
             <div class="flex gap-4">
               <div class="flex-1">
@@ -139,7 +173,7 @@ require 'includes/header.php';
           <div class="card-border p-4 mb-6">
             <div class="flex items-center gap-2 mb-3">
               <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-500"><i data-lucide="battery-medium" class="w-3.5 h-3.5"></i></div>
-              <h3 class="font-bold text-[#0f2b46] text-sm">Batterie capteur</h3>
+              <h3 class="font-bold text-brand-dark dark:text-white text-sm">Batterie capteur</h3>
             </div>
             <div class="flex gap-4">
               <div class="flex-1">
@@ -155,11 +189,178 @@ require 'includes/header.php';
           </button>
       </form>
 
-      <form action="logout.php" method="POST">
-          <button type="submit" class="btn-outline text-red-500 border-red-200 bg-red-50 flex items-center justify-center gap-2 w-full">
-            <i data-lucide="log-out" class="w-4 h-4"></i> Déconnexion
-          </button>
-      </form>
+      <!-- SECTION SYSTÈME -->
+      <div class="card-border p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center text-purple-500"><i data-lucide="zap" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-brand-dark dark:text-white text-sm">Paramètres Système</h3>
+        </div>
+        <div class="mb-4">
+            <div class="flex justify-between mb-2">
+                <label class="text-xs font-black text-slate-500 uppercase">Vitesse de Simulation</label>
+                <span id="vitesse-val" class="text-xs font-black text-purple-600"><?= $vitesse_actuelle ?>x</span>
+            </div>
+            <input type="range" id="sim-speed" min="0.1" max="5.0" step="0.1" value="<?= $vitesse_actuelle ?>" 
+                   class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                   oninput="updateSpeedVal(this.value)" onchange="saveSpeed(this.value)">
+            <p class="text-[10px] text-slate-400 font-bold mt-2 italic">Ajuste la vitesse à laquelle les capteurs fluctuent en temps réel.</p>
+        </div>
+      </div>
+
+      <!-- SECTION PRÉFÉRENCES -->
+      <div class="card-border p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-orange-100 rounded-md flex items-center justify-center text-orange-500"><i data-lucide="layout" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-[#0f2b46] text-sm dark:text-white">Préférences d'Affichage</h3>
+        </div>
+        <div class="flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <span class="text-[12px] font-bold text-slate-600 dark:text-slate-400">Langue de l'interface</span>
+                <select id="lang-select" onchange="localStorage.setItem('lang', this.value)" class="text-[11px] font-black text-slate-400 bg-transparent outline-none cursor-pointer">
+                    <option value="fr">Français (FR)</option>
+                    <option value="en">English (EN)</option>
+                </select>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-[12px] font-bold text-slate-600 dark:text-slate-400">Unités de mesure</span>
+                <select id="unit-select" onchange="localStorage.setItem('units', this.value)" class="text-[11px] font-black text-slate-400 bg-transparent outline-none cursor-pointer">
+                    <option value="metric">Métriques (°C, %)</option>
+                    <option value="imperial">Impériales (°F)</option>
+                </select>
+            </div>
+            <div class="flex justify-between items-center">
+                <div>
+                   <span class="text-[12px] font-bold text-slate-600 dark:text-slate-400">Thème Sombre</span>
+                   <p class="text-[9px] text-slate-400 font-bold">Activer l'interface nocturne</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                   <input type="checkbox" id="dark-toggle" class="sr-only peer" onchange="toggleTheme(this.checked)" />
+                   <div class="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-dark"></div>
+                </label>
+            </div>
+        </div>
+      </div>
+
+      <!-- SECTION SÉCURITÉ -->
+      <div class="card-border p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-500"><i data-lucide="shield" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-[#0f2b46] text-sm dark:text-white">Sécurité</h3>
+        </div>
+        
+        <div id="password-form-container">
+            <button onclick="showPasswordForm()" class="w-full p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-[11px] font-bold text-slate-600 dark:text-slate-400 flex items-center justify-between">
+                Changer le mot de passe <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+            </button>
+        </div>
+      </div>
+
+      <!-- SECTION MAINTENANCE -->
+      <div class="card-border p-4 mb-24 bg-red-50/10 dark:bg-red-900/10 border-red-100 dark:border-red-900/30">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-red-100 dark:bg-red-900/40 rounded-md flex items-center justify-center text-red-500"><i data-lucide="wrench" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-red-600 dark:text-red-400 text-sm">Maintenance</h3>
+        </div>
+        <div class="flex flex-col gap-3">
+            <button onclick="runMaintenance('clear_alerts')" class="w-full p-4 bg-white dark:bg-slate-800/60 border border-red-200 dark:border-red-900/40 rounded-xl text-[12px] font-black text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Supprimer toutes les alertes
+            </button>
+            <button onclick="runMaintenance('clear_history')" class="w-full p-4 bg-white dark:bg-slate-800/60 border border-red-200 dark:border-red-900/40 rounded-xl text-[12px] font-black text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <i data-lucide="history" class="w-4 h-4"></i> Vider l'historique des données
+            </button>
+        </div>
+      </div>
+
+      <script>
+      // Initialiser les sélecteurs
+      if (localStorage.getItem('theme') === 'dark') {
+          document.getElementById('dark-toggle').checked = true;
+      }
+      if (localStorage.getItem('lang')) {
+          document.getElementById('lang-select').value = localStorage.getItem('lang');
+      }
+      if (localStorage.getItem('units')) {
+          document.getElementById('unit-select').value = localStorage.getItem('units');
+      }
+
+      function toggleTheme(isDark) {
+          if (isDark) {
+              document.documentElement.classList.add('dark');
+              localStorage.setItem('theme', 'dark');
+          } else {
+              document.documentElement.classList.remove('dark');
+              localStorage.setItem('theme', 'light');
+          }
+      }
+
+      function showPasswordForm() {
+          document.getElementById('password-form-container').innerHTML = `
+            <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700">
+                <form id="pass-form" class="space-y-3">
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Mot de passe actuel</label>
+                        <input type="password" id="current-pass" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs" required />
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Nouveau mot de passe</label>
+                        <input type="password" id="new-pass" class="w-full p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-xs" required />
+                    </div>
+                    <button type="submit" class="w-full p-2 bg-brand-dark text-white rounded-lg text-xs font-black">Mettre à jour</button>
+                    <button type="button" onclick="location.reload()" class="w-full p-2 text-slate-400 text-[10px] font-bold">Annuler</button>
+                </form>
+            </div>
+          `;
+          
+          document.getElementById('pass-form').onsubmit = function(e) {
+              e.preventDefault();
+              const current = document.getElementById('current-pass').value;
+              const next = document.getElementById('new-pass').value;
+              
+              fetch('api/change_password.php', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                  body: `current_password=${encodeURIComponent(current)}&new_password=${encodeURIComponent(next)}`
+              })
+              .then(res => res.json())
+              .then(data => {
+                  const type = data.success ? 'success' : 'error';
+                  showToast(data.message, type);
+                  if(data.success) setTimeout(() => location.reload(), 1500);
+              });
+          };
+      }
+
+      function updateSpeedVal(val) {
+          document.getElementById('vitesse-val').innerText = val + 'x';
+      }
+
+      function saveSpeed(val) {
+          fetch('api/save_system_settings.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: 'vitesse=' + val
+          }).then(() => showToast('Vitesse de simulation mise à jour', 'success'));
+      }
+
+      function runMaintenance(action) {
+          const labels = {
+              'clear_alerts': 'toutes les alertes',
+              'clear_history': 'l\'historique des données'
+          };
+          showConfirm('Es-tu sûr de vouloir supprimer ' + labels[action] + ' ?', () => {
+              fetch('api/manage_maintenance.php?action=' + action)
+              .then(res => res.json())
+              .then(data => {
+                  if(data.success) {
+                      showToast(data.message, 'success');
+                      if(action === 'clear_alerts') setTimeout(() => location.reload(), 1500);
+                  } else {
+                      showToast(data.message || 'Une erreur est survenue', 'error');
+                  }
+              });
+          });
+      }
+      </script>
     </main>
 
 <?php
