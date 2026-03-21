@@ -37,164 +37,181 @@ if (!empty($latitudes) && !empty($longitudes)) {
     $zoom = 13;
 }
 
+/* Inclusion logique UI et encapsulation layout globale */
+require_once 'includes/functions.php';
+
+$page_title = 'Carte - FarmsConnect';
 $active_nav = 'carte';
+
+require 'includes/header.php';
 ?>
 
-<!DOCTYPE html>
-<html lang="fr" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carte - FarmsConnect</title>
-    <meta name="description" content="Visualisation cartographique de la ferme et des équipements">
-
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-
-    <!-- FarmsConnect Styles -->
-    <link rel="stylesheet" href="css/app.css">
-
-    <!-- Fonts and Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
-
-    <style>
-        #map {
-            height: calc(100vh - 140px);
-            width: 100%;
-            border-radius: 16px;
-            margin: 16px;
-            margin-bottom: 80px;
-        }
-
-        .equipment-marker {
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 12px;
-            width: 32px;
-            height: 32px;
-        }
-
-        .equipment-popup {
-            min-width: 200px;
-        }
-
-        .equipment-popup h3 {
-            margin: 0 0 8px 0;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .equipment-popup .status {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 8px;
-        }
-
-        .equipment-popup .value {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 4px 0;
-        }
-
-        .legend {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            z-index: 1000;
-            max-width: 200px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
-            font-size: 12px;
-        }
-
-        .legend-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-    </style>
-</head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-inter h-full">
-    <!-- Header -->
-    <header class="flex justify-between items-start mt-4 mb-6 px-4">
-        <div class="flex items-center gap-2">
-            <div class="w-10 h-10 bg-brand-green-light border border-brand-green rounded-[14px] flex items-center justify-center">
-                <img src="assets/icon.png" alt="FarmsConnect Logo" class="w-6 h-6" />
-            </div>
-            <div>
-                <h1 class="text-[1.1rem] font-black text-brand-dark dark:text-white">Carte</h1>
-                <p class="text-xs text-slate-400">Vue d'ensemble de la ferme</p>
-            </div>
+<!-- Header -->
+<header class="flex justify-between items-start mt-4 mb-6 px-4">
+    <div class="flex items-center gap-2">
+        <div class="w-10 h-10 bg-brand-green-light border border-brand-green rounded-[14px] flex items-center justify-center">
+            <img src="assets/icon.png" alt="FarmsConnect Logo" class="w-6 h-6" />
         </div>
-    </header>
-
-    <!-- Map Container -->
-    <div id="map" class="card-border"></div>
-
-    <!-- Legend -->
-    <div class="legend">
-        <h4 class="font-semibold text-sm mb-2">Légende</h4>
-        <div class="legend-item">
-            <div class="legend-dot bg-green-500"></div>
-            <span>Capteur normal</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot bg-orange-500"></div>
-            <span>Capteur alerte</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot bg-red-500"></div>
-            <span>Capteur critique</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot bg-blue-500"></div>
-            <span>Détecteur mouvement</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot bg-gray-500"></div>
-            <span>Actionneur arrêté</span>
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot bg-green-600"></div>
-            <span>Actionneur en marche</span>
+        <div>
+            <h1 class="text-[1.1rem] font-black text-brand-dark dark:text-white">Carte</h1>
+            <p class="text-xs text-slate-400">Vue d'ensemble de la ferme</p>
         </div>
     </div>
+</header>
 
-    <!-- Navigation -->
-    <?php include 'includes/nav.php'; ?>
+<!-- Map Container -->
+<div id="map" class="card-border mx-4 mb-4" style="height: calc(100vh - 180px);"></div>
 
-    <!-- Scripts -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
+<!-- Legend -->
+<div class="legend fixed top-20 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-lg z-[1000] max-w-[200px]">
+    <h4 class="font-semibold text-sm mb-2 text-slate-800 dark:text-white">Légende</h4>
+    <div class="space-y-2">
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="text-xs text-slate-600 dark:text-slate-300">Capteur normal</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+            <span class="text-xs text-slate-600 dark:text-slate-300">Capteur alerte</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <span class="text-xs text-slate-600 dark:text-slate-300">Capteur critique</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+            <span class="text-xs text-slate-600 dark:text-slate-300">Détecteur mouvement</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-gray-500"></div>
+            <span class="text-xs text-slate-600 dark:text-slate-300">Actionneur arrêté</span>
+        </div>
+        <div class="flex items-center gap-2">
+            <div class="w-3 h-3 rounded-full bg-green-600"></div>
+            <span class="text-xs text-slate-600 dark:text-slate-300">Actionneur en marche</span>
+        </div>
+    </div>
+</div>
 
-    <script>
-        // Initialize map
-        const map = L.map('map').setView([<?php echo $centerLat; ?>, <?php echo $centerLng; ?>], <?php echo $zoom; ?>);
+<!-- Status Bar -->
+<div id="map-status" class="fixed bottom-20 left-4 right-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-3 shadow-lg z-[1000]">
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+            <span class="text-xs font-medium text-slate-600 dark:text-slate-300">Synchronisation active</span>
+        </div>
+        <div class="text-xs text-slate-400" id="last-map-update">Mis à jour à l'instant</div>
+    </div>
+</div>
+
+<?php require 'includes/footer.php'; ?>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+
+<!-- Custom Map Styles -->
+<style>
+    .equipment-marker {
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 11px;
+        width: 28px;
+        height: 28px;
+    }
+
+    .equipment-popup {
+        min-width: 180px;
+        font-size: 14px;
+    }
+
+    .equipment-popup h3 {
+        margin: 0 0 6px 0;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .equipment-popup .status {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    .equipment-popup .value {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 4px 0;
+    }
+
+    .leaflet-popup-content-wrapper {
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .leaflet-popup-tip {
+        background-color: white;
+    }
+
+    /* Dark mode support for map */
+    html.dark .legend {
+        background-color: rgb(30 41 59);
+        border-color: rgb(51 65 85);
+    }
+
+    html.dark .legend h4 {
+        color: white;
+    }
+
+    html.dark #map-status {
+        background-color: rgb(30 41 59);
+        border-color: rgb(51 65 85);
+    }
+</style>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+
+<script>
+    // Global variables
+    let map;
+    let equipmentMarkers = [];
+    let farmZoneLayer = null;
+    let lastUpdateTime = Date.now();
+
+    // Equipment data cache
+    let currentEquipments = <?php echo json_encode($equipements); ?>;
+    let currentZone = <?php echo $zoneFerme ? json_encode($zoneFerme) : 'null'; ?>;
+
+    // Color mapping for markers
+    const colorMap = {
+        'normal': '#10b981',    // green
+        'alerte': '#f59e0b',    // orange
+        'critique': '#ef4444',  // red
+        'arret': '#6b7280',     // gray
+        'marche': '#16a34a'     // green-600
+    };
+
+    // Icon mapping for equipment types
+    const iconMap = {
+        'capteur': '📊',
+        'actionneur': '⚙️'
+    };
+
+    // Initialize map
+    function initMap() {
+        map = L.map('map').setView([<?php echo $centerLat; ?>, <?php echo $centerLng; ?>], <?php echo $zoom; ?>);
 
         // Add OpenStreetMap tiles
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -202,43 +219,49 @@ $active_nav = 'carte';
             maxZoom: 19
         }).addTo(map);
 
-        // Add farm zone if available
-        <?php if ($zoneFerme && $zoneFerme['coordonnees']): ?>
-        try {
-            const zoneCoords = <?php echo $zoneFerme['coordonnees']; ?>;
-            const zonePolygon = L.polygon(zoneCoords, {
-                color: '<?php echo $zoneFerme['couleur']; ?>',
-                fillColor: '<?php echo $zoneFerme['couleur']; ?>',
-                fillOpacity: 0.1,
-                weight: 2
-            }).addTo(map);
-
-            zonePolygon.bindPopup('<b><?php echo htmlspecialchars($zoneFerme['nom']); ?></b><br/>Zone délimitée de la ferme');
-        } catch (e) {
-            console.error('Erreur lors du chargement de la zone:', e);
-        }
-        <?php endif; ?>
-
-        // Equipment data
-        const equipements = <?php echo json_encode($equipements); ?>;
-
-        // Color mapping for markers
-        const colorMap = {
-            'normal': '#10b981',    // green
-            'alerte': '#f59e0b',    // orange
-            'critique': '#ef4444',  // red
-            'arret': '#6b7280',     // gray
-            'marche': '#16a34a'     // green-600
-        };
-
-        // Icon mapping for equipment types
-        const iconMap = {
-            'capteur': '📊',
-            'actionneur': '⚙️'
-        };
+        // Add farm zone
+        updateFarmZone();
 
         // Add equipment markers
-        equipements.forEach(equipement => {
+        updateEquipmentMarkers();
+
+        // Start real-time updates
+        startRealtimeUpdates();
+    }
+
+    // Update farm zone display
+    function updateFarmZone() {
+        // Remove existing zone
+        if (farmZoneLayer) {
+            map.removeLayer(farmZoneLayer);
+        }
+
+        // Add new zone if available
+        if (currentZone && currentZone.coordonnees) {
+            try {
+                const zoneCoords = currentZone.coordonnees;
+                farmZoneLayer = L.polygon(zoneCoords, {
+                    color: currentZone.couleur || '#22c55e',
+                    fillColor: currentZone.couleur || '#22c55e',
+                    fillOpacity: 0.1,
+                    weight: 2
+                }).addTo(map);
+
+                farmZoneLayer.bindPopup('<b>' + (currentZone.nom || 'Zone de ferme') + '</b><br/>Zone délimitée de la ferme');
+            } catch (e) {
+                console.error('Erreur lors du chargement de la zone:', e);
+            }
+        }
+    }
+
+    // Update equipment markers
+    function updateEquipmentMarkers() {
+        // Clear existing markers
+        equipmentMarkers.forEach(marker => map.removeLayer(marker));
+        equipmentMarkers = [];
+
+        // Add new markers
+        currentEquipments.forEach(equipement => {
             if (!equipement.latitude || !equipement.longitude) return;
 
             const color = colorMap[equipement.statut] || '#6b7280';
@@ -254,8 +277,8 @@ $active_nav = 'carte';
             const customIcon = L.divIcon({
                 html: markerHtml,
                 className: 'custom-equipment-marker',
-                iconSize: [32, 32],
-                iconAnchor: [16, 16]
+                iconSize: [28, 28],
+                iconAnchor: [14, 14]
             });
 
             const marker = L.marker([equipement.latitude, equipement.longitude], {
@@ -294,10 +317,76 @@ $active_nav = 'carte';
             `;
 
             marker.bindPopup(popupContent);
+            equipmentMarkers.push(marker);
         });
+    }
 
-        // Initialize Lucide icons
-        lucide.createIcons();
-    </script>
-</body>
-</html>
+    // Real-time updates
+    function startRealtimeUpdates() {
+        // Update every 5 seconds (same as dashboard)
+        setInterval(fetchMapData, 5000);
+    }
+
+    // Fetch updated map data
+    function fetchMapData() {
+        fetch('api/get_map_data.php')
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update equipment data
+                    const hasEquipmentChanges = JSON.stringify(currentEquipments) !== JSON.stringify(data.equipements);
+                    const hasZoneChanges = JSON.stringify(currentZone) !== JSON.stringify(data.zones[0] || null);
+
+                    if (hasEquipmentChanges || hasZoneChanges) {
+                        currentEquipments = data.equipements;
+                        currentZone = data.zones[0] || null;
+
+                        // Update display
+                        updateFarmZone();
+                        updateEquipmentMarkers();
+
+                        // Update timestamp
+                        lastUpdateTime = Date.now();
+                        updateStatusDisplay();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Erreur de synchronisation:', error);
+                updateStatusDisplay('Erreur de connexion');
+            });
+    }
+
+    // Update status display
+    function updateStatusDisplay(status = null) {
+        const statusEl = document.getElementById('last-map-update');
+        if (status) {
+            statusEl.textContent = status;
+            statusEl.className = 'text-xs text-red-500';
+        } else {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            statusEl.textContent = 'Mis à jour à ' + timeString;
+            statusEl.className = 'text-xs text-slate-400';
+        }
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+        initMap();
+        updateStatusDisplay();
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (map) {
+            map.invalidateSize();
+        }
+    });
+</script>
+
+
+

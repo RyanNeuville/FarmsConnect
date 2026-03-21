@@ -4,8 +4,8 @@
  * API pour récupérer les données cartographiques (équipements et zones).
  */
 
-require_once '../config/db.php';
-require_once '../includes/auth.php';
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/auth.php';
 
 header('Content-Type: application/json');
 
@@ -26,7 +26,13 @@ $equipements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Récupérer les zones de la ferme
 $stmtZones = $pdo->query("SELECT id, nom, coordonnees, couleur FROM zone_ferme ORDER BY cree_le DESC");
-$zones = $stmtZones->fetchAll(PDO::FETCH_ASSOC);
+$zonesRaw = $stmtZones->fetchAll(PDO::FETCH_ASSOC);
+
+// Décoder les coordonnées JSON pour chaque zone
+$zones = array_map(function($zone) {
+    $zone['coordonnees'] = json_decode($zone['coordonnees'], true);
+    return $zone;
+}, $zonesRaw);
 
 // Calculer le centre de la carte
 $latitudes = array_column($equipements, 'latitude');
