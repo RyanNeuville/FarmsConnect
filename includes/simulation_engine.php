@@ -86,16 +86,12 @@ function runSimulationEngine($pdo) {
 
 /**
  * Empêche de spammer la table des alertes.
- * Ne crée une alerte que si aucune alerte non lue n'existe pour cet équipement 
- * OU si la dernière alerte date de plus de 30 minutes.
+ * LOGIQUE PROFESSIONNELLE :
+ * Une alerte n'est générée que s'il n'y a AUCUNE alerte non lue pour cet équipement.
+ * Cela force l'utilisateur à traiter (ou supprimer) l'alerte avant d'en recevoir une nouvelle identique.
  */
 function generateAlertIfNotRecent($pdo, $equipId, $niveau, $message) {
-    $stmt = $pdo->prepare("
-        SELECT id FROM alertes 
-        WHERE equipement_id = ? 
-        AND (est_lu = 0 OR cree_le > DATE_SUB(NOW(), INTERVAL 30 MINUTE))
-        LIMIT 1
-    ");
+    $stmt = $pdo->prepare("SELECT id FROM alertes WHERE equipement_id = ? AND est_lu = 0 LIMIT 1");
     $stmt->execute([$equipId]);
     if ($stmt->rowCount() === 0) {
         $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (?, ?, ?)")

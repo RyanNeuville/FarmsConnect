@@ -41,13 +41,28 @@ require 'includes/header.php';
 ?>
 
       <!-- HEADER -->
-      <header class="flex items-center gap-3 mt-4 mb-6">
-        <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
-          <i data-lucide="bell" class="w-6 h-6"></i>
+      <header class="flex justify-between items-center mt-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500">
+            <i data-lucide="bell" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h1 class="text-[1.3rem] font-black text-[#0f2b46] leading-tight">Alertes</h1>
+            <p class="text-xs text-slate-400 font-bold"><?= $nonLues ?> non lues</p>
+          </div>
         </div>
-        <div>
-          <h1 class="text-[1.3rem] font-black text-[#0f2b46] leading-tight">Alertes</h1>
-          <p class="text-xs text-slate-400 font-bold"><?= $nonLues ?> non lues</p>
+        
+        <div class="flex gap-2">
+          <?php if ($nonLues > 0): ?>
+          <a href="api/manage_alerts.php?action=mark_all_read" class="w-10 h-10 bg-white card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-green-500 transition-colors" title="Tout lire">
+            <i data-lucide="check-check" class="w-5 h-5"></i>
+          </a>
+          <?php endif; ?>
+          <?php if (!empty($alertes)): ?>
+          <a href="api/manage_alerts.php?action=delete_all" onclick="return confirm('Voulez-vous vraiment vider tout le journal ?')" class="w-10 h-10 bg-white card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors" title="Tout supprimer">
+            <i data-lucide="trash-2" class="w-5 h-5"></i>
+          </a>
+          <?php endif; ?>
         </div>
       </header>
 
