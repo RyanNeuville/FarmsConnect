@@ -27,6 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          */
         $pdo->prepare("INSERT INTO commandes_offline (equipement_id, nouvelle_valeur, synced) VALUES (?, ?, 1)")
             ->execute([$equipement_id, $action]);
+
+        // Support AJAX : Si la requête demande du JSON, on répond sans redirection
+        if (isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest')) {
+            header('Content-Type: application/json');
+            echo json_encode(['status' => 'success', 'equipement_id' => $equipement_id, 'new_statut' => $statut]);
+            exit;
+        }
     }
 
     /* Débranchement de la requête d'API et retour silencieux à l'interface d'origine de l'utilisateur */

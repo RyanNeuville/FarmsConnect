@@ -63,6 +63,9 @@ require 'includes/header.php';
             <i data-lucide="trash-2" class="w-5 h-5"></i>
           </a>
           <?php endif; ?>
+          <a href="logout.php" class="w-10 h-10 bg-white card-border rounded-xl flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors" title="Déconnexion">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
+          </a>
         </div>
       </header>
 

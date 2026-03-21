@@ -58,12 +58,15 @@ require 'includes/header.php';
           </div>
         </div>
 
-        <div class="relative">
+        <div class="flex gap-2">
           <a href="alertes.php" class="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 shadow-sm block relative">
             <i data-lucide="bell" class="w-5 h-5"></i>
             <span id="alert-badge" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-[18px] h-[18px] flex items-center justify-center rounded-full border-2 border-[#fafbfd] <?= ($alertesCount > 0) ? '' : 'hidden' ?>">
               <?= $alertesCount > 9 ? '9+' : $alertesCount ?>
             </span>
+          </a>
+          <a href="logout.php" class="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-red-500 shadow-sm" title="Déconnexion">
+            <i data-lucide="log-out" class="w-5 h-5"></i>
           </a>
         </div>
       </header>
@@ -123,7 +126,9 @@ require 'includes/header.php';
             <?= getStatusBadge($act['statut']) ?>
           </div>
           <h3 class="text-xs font-bold text-slate-800 mb-3"><?= htmlspecialchars($act['nom']) ?></h3>
-          <?= getActionButton($act['statut']) ?>
+          <div class="actuator-control-container" data-id="<?= $act['id'] ?>">
+            <?= getActionButton($act['statut'], $act['id']) ?>
+          </div>
           <a href="actionneur.php?id=<?= $act['id'] ?>" class="text-[10px] text-slate-400 font-bold text-center mt-3 block flex items-center justify-center gap-1">
             Détails <i data-lucide="chevron-right" class="w-3 h-3"></i>
           </a>
@@ -211,6 +216,24 @@ function refreshDashboard() {
                         }
                     }
 
+                    // Mise à jour spécifique pour les actionneurs (boutons)
+                    const actuatorCont = document.querySelector(`.actuator-control-container[data-id="${eq.id}"]`);
+                    if (actuatorCont) {
+                        // On vérifie si le bouton actuel correspond au nouveau statut
+                        const btn = actuatorCont.querySelector('.actuator-btn');
+                        const currentAction = btn.getAttribute('data-action'); // 1=OFF->ON, 0=ON->OFF
+                        const expectedAction = (eq.statut === 'marche') ? "0" : "1";
+                        
+                        if (currentAction !== expectedAction) {
+                            fetch(`api/get_button_html.php?id=${eq.id}&statut=${eq.statut}`)
+                                .then(res => res.text())
+                                .then(html => {
+                                    actuatorCont.innerHTML = html;
+                                    if (window.lucide) lucide.createIcons();
+                                });
+                        }
+                    }
+
                     // Gestion spécifique de l'intrusion (ID 7)
                     if (eq.id == 7) {
                         const overlay = document.getElementById('intrusion-overlay');
@@ -273,6 +296,40 @@ function refreshDashboard() {
 
 // Lancement du polling toutes les 3 secondes
 setInterval(refreshDashboard, 3000);
+
+/**
+ * Gestionnaire de clics sur les boutons d'actionneurs (AJAX)
+ */
+document.addEventListener('click', function(e) {
+    const btn = e.target.closest('.actuator-btn');
+    if (btn) {
+        const id = btn.getAttribute('data-id');
+        const action = btn.getAttribute('data-action');
+        
+        // Feedback visuel immédiat (Loading state)
+        btn.classList.add('opacity-50', 'pointer-events-none');
+        
+        const formData = new FormData();
+        formData.append('equipement_id', id);
+        formData.append('action', action);
+        
+        fetch('api/action.php?ajax=1', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                // On force un rafraîchissement immédiat pour voir le changement
+                refreshDashboard();
+            }
+        })
+        .catch(err => console.error('Action error:', err))
+        .finally(() => {
+            btn.classList.remove('opacity-50', 'pointer-events-none');
+        });
+    }
+});
 </script>
 
 <?php
