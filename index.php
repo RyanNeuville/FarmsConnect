@@ -17,7 +17,8 @@ $user_nom = $_SESSION['user_nom'] ?? 'Utilisateur';
  * Requête globale de récupération de l'ensemble de l'inventaire matériel
  * afin d'hydrater l'interface de contrôle sans requêtes itératives successives.
  */
-$stmt = $pdo->query("SELECT * FROM equipements ORDER BY id ASC");
+$stmt = $pdo->prepare("SELECT * FROM equipements ORDER BY id ASC");
+$stmt->execute();
 $equipements = $stmt->fetchAll();
 
 $capteurs = [];
@@ -34,7 +35,8 @@ foreach ($equipements as $eq) {
  * Comptage rapide du volume d'anomalies non purgées 
  * pour le badge de notification global.
  */
-$stmtAlertes = $pdo->query("SELECT COUNT(*) as nb FROM alertes WHERE est_lu = 0");
+$stmtAlertes = $pdo->prepare("SELECT COUNT(*) as nb FROM alertes WHERE est_lu = ?");
+$stmtAlertes->execute([0]);
 $alertesCount = $stmtAlertes->fetch()['nb'];
 
 /* Inclusion logique UI et encapsulation layout globale */

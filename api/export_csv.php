@@ -113,7 +113,7 @@ if ($type === 'history') {
 
     $stmt = $pdo->query("
         SELECT h.*, e.nom, e.unite
-        FROM historique_capteurs h
+        FROM historique_donnees h
         JOIN equipements e ON h.equipement_id = e.id
         WHERE h.enregistre_le >= NOW() - INTERVAL 24 HOUR
         ORDER BY h.enregistre_le DESC

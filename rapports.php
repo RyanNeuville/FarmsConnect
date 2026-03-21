@@ -33,7 +33,7 @@ $statsAlertes = $pdo->query("
 // Historique des 24 dernières heures (données capteurs)
 $historique = $pdo->query("
     SELECT h.*, e.nom, e.unite, e.icone
-    FROM historique_capteurs h
+    FROM historique_donnees h
     JOIN equipements e ON h.equipement_id = e.id
     ORDER BY h.enregistre_le DESC
     LIMIT 200
@@ -238,8 +238,10 @@ require 'includes/header.php';
           </a>
         </div>
       </div>
-
+<div class="fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white/95 backdrop-blur-sm z-[999]">
+<?php  require 'includes/nav.php';?>
+</div>
 <?php
-require 'includes/nav.php';
 require 'includes/footer.php';
 ?>
+
