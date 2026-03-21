@@ -33,7 +33,7 @@ $statsAlertes = $pdo->query("
 // Historique des 24 dernières heures (données capteurs)
 $historique = $pdo->query("
     SELECT h.*, e.nom, e.unite, e.icone
-    FROM historique_capteurs h
+    FROM historique_donnees h
     JOIN equipements e ON h.equipement_id = e.id
     ORDER BY h.enregistre_le DESC
     LIMIT 200
