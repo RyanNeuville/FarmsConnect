@@ -256,16 +256,16 @@ require 'includes/header.php';
       </div>
 
       <!-- SECTION MAINTENANCE -->
-      <div class="card-border p-4 mb-24 bg-red-50/20 border-red-100">
+      <div class="card-border p-4 mb-24 bg-red-50/10 dark:bg-red-900/10 border-red-100 dark:border-red-900/30">
         <div class="flex items-center gap-2 mb-4">
-          <div class="w-6 h-6 bg-red-100 rounded-md flex items-center justify-center text-red-500"><i data-lucide="wrench" class="w-3.5 h-3.5"></i></div>
-          <h3 class="font-bold text-red-700 text-sm">Maintenance</h3>
+          <div class="w-6 h-6 bg-red-100 dark:bg-red-900/40 rounded-md flex items-center justify-center text-red-500"><i data-lucide="wrench" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-red-600 dark:text-red-400 text-sm">Maintenance</h3>
         </div>
         <div class="flex flex-col gap-3">
-            <button onclick="runMaintenance('clear_alerts')" class="w-full p-4 bg-white border border-red-200 rounded-xl text-[12px] font-black text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <button onclick="runMaintenance('clear_alerts')" class="w-full p-4 bg-white dark:bg-slate-800/60 border border-red-200 dark:border-red-900/40 rounded-xl text-[12px] font-black text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 shadow-sm">
                 <i data-lucide="trash-2" class="w-4 h-4"></i> Supprimer toutes les alertes
             </button>
-            <button onclick="runMaintenance('clear_history')" class="w-full p-4 bg-white border border-red-200 rounded-xl text-[12px] font-black text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center gap-2 shadow-sm">
+            <button onclick="runMaintenance('clear_history')" class="w-full p-4 bg-white dark:bg-slate-800/60 border border-red-200 dark:border-red-900/40 rounded-xl text-[12px] font-black text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center gap-2 shadow-sm">
                 <i data-lucide="history" class="w-4 h-4"></i> Vider l'historique des données
             </button>
         </div>
