@@ -50,12 +50,35 @@ $active_nav = 'reglages';
 require 'includes/header.php';
 ?>
       <!-- HEADER -->
-      <header class="flex items-center gap-3 mt-4 mb-6">
-        <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600">
-          <i data-lucide="settings" class="w-6 h-6"></i>
+      <header class="flex justify-between items-center mt-4 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-600">
+            <i data-lucide="settings" class="w-6 h-6"></i>
+          </div>
+          <div><h1 class="text-[1.3rem] font-black text-[#0f2b46] leading-tight">Réglages</h1></div>
         </div>
-        <div><h1 class="text-[1.3rem] font-black text-[#0f2b46] leading-tight">Réglages</h1></div>
+        <form action="logout.php" method="POST">
+            <button type="submit" class="w-10 h-10 bg-white border border-slate-200 rounded-full flex items-center justify-center text-red-500 shadow-sm" title="Déconnexion">
+                <i data-lucide="log-out" class="w-5 h-5"></i>
+            </button>
+        </form>
       </header>
+
+      <!-- SECTION MON PROFIL -->
+      <div class="card-border p-5 mb-8 bg-gradient-to-br from-[#0f2b46] to-[#1a3b5c] text-white relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="flex items-center gap-5 relative z-10">
+          <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 shadow-xl overflow-hidden">
+             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Farms&backgroundColor=b6e3f4" alt="Avatar" class="w-full h-full object-cover">
+          </div>
+          <div class="flex-1">
+            <h2 class="text-lg font-black leading-tight"><?= htmlspecialchars($user_nom) ?></h2>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] font-black uppercase tracking-wider rounded-md border border-green-500/30">Connecté</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <?php if (!empty($message_succes)): ?>
       <div class="bg-green-50 text-green-600 font-bold p-3 rounded-xl mb-4 text-sm flex items-center gap-2 border border-green-200">

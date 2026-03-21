@@ -248,7 +248,7 @@ function refreshDashboard() {
 
                 // Mise à jour de la Météo
                 if (data.weather) {
-                    document.getElementById('weather-temp').innerText = data.weather.temp + '°C';
+                    document.getElementById('weather-temp').innerText = data.weather.temp;
                     document.getElementById('weather-desc').innerText = data.weather.condition;
                     const wIcon = document.getElementById('weather-icon');
                     wIcon.setAttribute('data-lucide', data.weather.icon);
@@ -273,7 +273,7 @@ function refreshDashboard() {
                     let html = '';
                     data.activites.forEach(act => {
                         html += `
-                        <div class="flex justify-between items-center p-4 border-b border-slate-100 animate-pulse-quick">
+                        <a href="alertes.php" class="flex justify-between items-center p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors block">
                           <div class="flex items-center gap-3">
                             <i data-lucide="${act.icone}" class="w-5 h-5 ${act.niveau === 'critique' ? 'text-red-500' : 'text-blue-500'}"></i>
                             <p class="text-[13px] font-bold text-slate-700">${act.message}</p>
@@ -282,7 +282,7 @@ function refreshDashboard() {
                             <i data-lucide="clock" class="w-3 h-3"></i> 
                             ${new Date(act.cree_le).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                           </div>
-                        </div>`;
+                        </a>`;
                     });
                     activitiesContainer.innerHTML = html;
                     // On demande à Lucide de re-scanné le nouveau HTML pour générer les icônes SVGs
