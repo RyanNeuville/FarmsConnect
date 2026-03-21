@@ -76,9 +76,9 @@ require 'includes/header.php';
              <?= htmlspecialchars($capteur['nom']) ?>
           </h1>
           <div class="mt-0.5">
-            <span class="pill" style="padding: 2px 6px; font-size: 10px; background-color: <?= $couleurStatus['bg'] ?>; color: <?= $couleurStatus['text'] ?>;">
-                <span class="status-dot" style="background-color: <?= $couleurStatus['dot'] ?>"></span>
-                <?= $couleurStatus['label'] ?>
+            <span id="status-badge" class="pill" style="padding: 2px 6px; font-size: 10px; background-color: <?= $couleurStatus['bg'] ?>; color: <?= $couleurStatus['text'] ?>;">
+                <span id="status-dot" class="status-dot" style="background-color: <?= $couleurStatus['dot'] ?>"></span>
+                <span id="status-label"><?= $couleurStatus['label'] ?></span>
             </span>
           </div>
         </div>
@@ -97,12 +97,12 @@ require 'includes/header.php';
         </div>
 
         <div class="flex items-baseline gap-1 mb-6 relative z-10">
-          <span class="text-5xl font-black tracking-tight"><?= htmlspecialchars($capteur['valeur_actuelle']) ?></span>
+          <span id="current-value" class="text-5xl font-black tracking-tight"><?= htmlspecialchars($capteur['valeur_actuelle']) ?></span>
           <span class="text-xl font-bold opacity-80"><?= htmlspecialchars($capteur['unite']) ?></span>
         </div>
 
         <div class="w-full h-1.5 bg-white/30 rounded-full mb-2 relative z-10">
-          <div class="h-1.5 bg-white rounded-full" style="width: <?= $percent ?>%"></div>
+          <div id="progress-fill" class="h-1.5 bg-white rounded-full" style="width: <?= $percent ?>%"></div>
         </div>
 
         <div class="flex justify-between text-[10px] font-bold opacity-80 relative z-10">
@@ -113,28 +113,23 @@ require 'includes/header.php';
 
       <!-- VUE GRAPHIQUE HISTORIQUE INTÉGRÉE (CHART SVG 7 JOURS) -->
       <div class="card-border p-5 mb-5 rounded-2xl">
-        <h3 class="text-xs font-black text-[#0f2b46] mb-4 text-left">Historique 7 jours</h3>
+        <h3 class="text-xs font-black text-[#0f2b46] mb-4 text-left">Historique réel</h3>
         <div class="h-28 w-full mt-4 flex flex-col justify-end relative">
-          <svg viewBox="0 0 100 50" class="w-full h-full overflow-visible" preserveAspectRatio="none">
+          <svg id="sensor-chart" viewBox="0 0 100 50" class="w-full h-full overflow-visible" preserveAspectRatio="none">
             <defs>
               <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stop-color="<?= $mainBgColor ?>" stop-opacity="0.3" />
                 <stop offset="100%" stop-color="<?= $mainBgColor ?>" stop-opacity="0" />
               </linearGradient>
             </defs>
-            <polygon points="10,25 25,18 40,15 55,18 70,10 85,15 100,15 100,50 10,50" fill="url(#chartGradient)" />
-            <polyline points="10,25 25,18 40,15 55,18 70,10 85,15 100,15" fill="none" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
-            <circle cx="10" cy="25" r="2" fill="white" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
-            <circle cx="25" cy="18" r="2" fill="white" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
-            <circle cx="40" cy="15" r="2" fill="white" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
-            <circle cx="55" cy="18" r="2" fill="white" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
-            <circle cx="70" cy="10" r="2" fill="white" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
-            <circle cx="85" cy="15" r="2" fill="white" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
-            <circle cx="100" cy="15" r="2" fill="white" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
+            <polygon id="chart-polygon" points="" fill="url(#chartGradient)" />
+            <polyline id="chart-line" points="" fill="none" stroke="<?= $mainBgColor ?>" stroke-width="1.5" />
+            <!-- Points dynamiques -->
+            <g id="chart-points"></g>
           </svg>
 
           <div class="flex justify-between text-[9px] font-bold text-slate-400 mt-2 px-1">
-            <span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span>
+            <span>Passé</span><span>Aujourd'hui</span>
           </div>
         </div>
       </div>
@@ -160,6 +155,91 @@ require 'includes/header.php';
       </div>
       <?php endif; ?>
     </main>
+
+
+<script>
+const sensorId = <?= $id ?>;
+const minBound = <?= $capteur['seuil_min'] ?? 0 ?>;
+const maxBound = <?= $capteur['seuil_max'] ?? 100 ?>;
+const mainColor = '<?= $mainBgColor ?>';
+
+/**
+ * Mise à jour dynamique de la page de détails et du graphique SVG.
+ */
+function refreshSensorDetail() {
+    fetch(`api/get_sensor_history.php?id=${sensorId}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'success') {
+                const capteur = data.capteur;
+                const historique = data.historique;
+
+                // 1. Mise à jour de la valeur textuelle
+                const valElem = document.getElementById('current-value');
+                if (valElem.innerText != capteur.valeur_actuelle) {
+                    valElem.innerText = capteur.valeur_actuelle;
+                    valElem.classList.remove('animate-pulse-quick');
+                    void valElem.offsetWidth; 
+                    valElem.classList.add('animate-pulse-quick');
+                }
+
+                // 2. Mise à jour de la barre de progression
+                let percent = 50;
+                if (capteur.seuil_min !== null && capteur.seuil_max !== null) {
+                    percent = ((capteur.valeur_actuelle - capteur.seuil_min) / (capteur.seuil_max - capteur.seuil_min)) * 100;
+                    percent = Math.max(0, Math.min(100, percent));
+                } else if (capteur.unite === '%') {
+                    percent = capteur.valeur_actuelle;
+                }
+                document.getElementById('progress-fill').style.width = percent + '%';
+
+                // 3. Mise à jour du graphique SVG
+                if (historique && historique.length > 0) {
+                    updateChart(historique);
+                }
+            }
+        });
+}
+
+/**
+ * Calcule les coordonnées SVG et met à jour les chemins et points.
+ */
+function updateChart(data) {
+    const polyline = document.getElementById('chart-line');
+    const polygon = document.getElementById('chart-polygon');
+    const pointsGroup = document.getElementById('chart-points');
+    
+    // Déterminer les bornes pour le mapping Y (plus on est haut, plus la valeur est élevée)
+    // Mais en SVG, Y=0 est en haut. Donc on inverse.
+    const h = 50; // Hauteur SVG
+    const w = 100; // Largeur SVG
+    
+    // On trouve le min/max des données pour l'échelle ou on utilise les seuils
+    const vals = data.map(d => parseFloat(d.valeur));
+    const dMin = Math.min(...vals, minBound) - 2;
+    const dMax = Math.max(...vals, maxBound) + 2;
+    const range = dMax - dMin;
+
+    let pointsStr = '';
+    let circlesHtml = '';
+    
+    data.forEach((d, i) => {
+        const x = (i / (data.length - 1)) * w;
+        const y = h - ((parseFloat(d.valeur) - dMin) / range) * h;
+        pointsStr += `${x},${y} `;
+        circlesHtml += `<circle cx="${x}" cy="${y}" r="2" fill="white" stroke="${mainColor}" stroke-width="1.5" />`;
+    });
+
+    polyline.setAttribute('points', pointsStr);
+    polygon.setAttribute('points', `${pointsStr} 100,50 0,50`);
+    pointsGroup.innerHTML = circlesHtml;
+}
+
+// Premier lancement
+refreshSensorDetail();
+// Polling toutes les 3 secondes
+setInterval(refreshSensorDetail, 3000);
+</script>
 
 <?php
 require 'includes/nav.php';
