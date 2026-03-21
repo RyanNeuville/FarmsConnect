@@ -4,7 +4,7 @@
  * Composant de navigation inférieur fixe (Bottom Navigation Bar) de l'application.
  * 
  * Variable attendue avant l'inclusion :
- * @var string $active_nav Identifiant de l'onglet actif ('accueil', 'alertes', 'equipements', 'reglages')
+ * @var string $active_nav Identifiant de l'onglet actif ('accueil', 'alertes', 'rapports', 'equipements', 'carte', 'reglages')
  */
 if (!isset($active_nav)) {
     $active_nav = 'accueil';
@@ -18,7 +18,7 @@ if (!isset($active_nav)) {
  * @return string La classe CSS finale pour le rendu
  */
 function getNavClass($item, $active) {
-    return ($item === $active) ? 'nav-item active w-16' : 'nav-item w-16';
+    return ($item === $active) ? 'nav-item active w-12' : 'nav-item w-12';
 }
 
 /**
@@ -84,6 +84,14 @@ function getNavIconClass($item, $active, $baseIcons) {
               <i data-lucide="tractor" class="<?= getNavIconClass('equipements', $active_nav, 'w-5 h-5') ?>"></i>
             </div>
             <span>Équipements</span>
+          </a>
+        </li>
+        <li>
+          <a href="carte.php" class="<?= getNavClass('carte', $active_nav) ?>">
+            <?= getNavInnerContainer('carte', $active_nav) ?>
+              <i data-lucide="map" class="<?= getNavIconClass('carte', $active_nav, 'w-5 h-5') ?>"></i>
+            </div>
+            <span>Carte</span>
           </a>
         </li>
         <li>
