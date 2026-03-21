@@ -9,6 +9,7 @@ require_once 'includes/auth.php';
 
 forcer_connexion();
 
+$user_nom = $_SESSION['user_nom'] ?? 'Utilisateur';
 $message_succes = '';
 
 /* Interception et traitement du flux POST lors de la soumission du formulaire de configuration */
@@ -68,8 +69,8 @@ require 'includes/header.php';
       <div class="card-border p-5 mb-8 bg-gradient-to-br from-[#0f2b46] to-[#1a3b5c] text-white relative overflow-hidden">
         <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
         <div class="flex items-center gap-5 relative z-10">
-          <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 shadow-xl overflow-hidden">
-             <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Farms&backgroundColor=b6e3f4" alt="Avatar" class="w-full h-full object-cover">
+          <div class="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center border border-white/20 shadow-xl">
+             <i data-lucide="user" class="w-8 h-8 text-white"></i>
           </div>
           <div class="flex-1">
             <h2 class="text-lg font-black leading-tight"><?= htmlspecialchars($user_nom) ?></h2>
