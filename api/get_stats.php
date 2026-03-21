@@ -42,13 +42,38 @@ try {
     ");
     $activites = $stmtRecent->fetchAll();
 
+    /* Simulation de données météo simples */
+    $tempExt = 22 + (mt_rand(-20, 20) / 10);
+    $weather = [
+        'temp' => round($tempExt, 1),
+        'condition' => (date('H') > 19 || date('H') < 6) ? 'Nuit étoilée' : 'Ensoleillé',
+        'icon' => (date('H') > 19 || date('H') < 6) ? 'moon' : 'sun'
+    ];
+
+    /* Calcul de l'état global du système */
+    $hasCritical = false;
+    foreach ($equipements as $eq) {
+        if ($eq['statut'] === 'critique') {
+            $hasCritical = true;
+            break;
+        }
+    }
+
+    $systemStatus = [
+        'is_ok' => !$hasCritical,
+        'message' => $hasCritical ? 'Attention, anomalie détectée ⚠️' : 'Tout va bien 🌾',
+        'class' => $hasCritical ? 'text-red-600 bg-red-50 border-red-200' : 'text-green-600 bg-green-50 border-green-200'
+    ];
+
     /* Agrégation de la réponse structurée */
     echo json_encode([
         'status' => 'success',
         'timestamp' => date('H:i'),
         'alertes_count' => $alertesCount,
         'equipements' => $equipements,
-        'activites' => $activites
+        'activites' => $activites,
+        'weather' => $weather,
+        'system_status' => $systemStatus
     ]);
 
 } catch (Exception $e) {

@@ -38,9 +38,9 @@ function runSimulationEngine($pdo) {
         // Dérive aléatoire (±0.5 maximum)
         $changement = mt_rand(-50, 50) / 100;
         
-        // Comportement spécifique : La batterie décline lentement
+        // Comportement spécifique : La batterie décline très lentement (division par 5 du facteur précédent)
         if ($capteur['icone'] === 'battery-medium') {
-            $changement = - (mt_rand(1, 10) / 100);
+            $changement = - (mt_rand(1, 2) / 100); 
         }
 
         $nouvelleValeur = max(0, (float)$capteur['valeur_actuelle'] + $changement);
@@ -63,9 +63,9 @@ function runSimulationEngine($pdo) {
                 ->execute([$capteur['id'], $nouvelleValeur]);
         }
 
-        // Déclenchement d'alertes si critique
-        if ($nouveauStatut === 'critique') {
-            $msg = "Alerte critique sur " . $capteur['nom'] . " : " . $nouvelleValeur . $capteur['unite'];
+        // Déclenchement d'alertes si critique et statut a changé (Anti-spam)
+        if ($nouveauStatut === 'critique' && $capteur['statut'] !== 'critique') {
+            $msg = "Alerte : " . $capteur['nom'] . " hors seuils (" . $nouvelleValeur . $capteur['unite'] . ")";
             generateAlertIfNotRecent($pdo, $capteur['id'], 'critique', $msg);
         }
     }
@@ -73,9 +73,9 @@ function runSimulationEngine($pdo) {
     /* 
      * -- PHASE 2 : SIMULATION D'INTRUSION (EVENEMENT RARE) --
      */
-    if (mt_rand(1, 50) === 1) { // 2% de chances par cycle (environ toutes les 4-5 minutes de polling)
+    if (mt_rand(1, 50) === 1) { // 2% de chances par cycle
         $pdo->prepare("UPDATE equipements SET valeur_actuelle = 1, statut = 'critique' WHERE id = 7")->execute();
-        generateAlertIfNotRecent($pdo, 7, 'critique', 'ALERTE SÉCURITÉ : Mouvement détecté Zone A !');
+        generateAlertIfNotRecent($pdo, 7, 'critique', 'SÉCURITÉ : Mouvement détecté Zone A !');
     } else {
         // Après 30 secondes d'intrusion, on repasse en normal (reset automatique)
         $pdo->prepare("UPDATE equipements SET valeur_actuelle = 0, statut = 'normal' WHERE id = 7 AND mis_a_jour_le < DATE_SUB(NOW(), INTERVAL 30 SECOND)")->execute();
@@ -85,11 +85,18 @@ function runSimulationEngine($pdo) {
 }
 
 /**
- * Empêche de spammer la table des alertes si une alerte identique est déjà active.
+ * Empêche de spammer la table des alertes.
+ * Ne crée une alerte que si aucune alerte non lue n'existe pour cet équipement 
+ * OU si la dernière alerte date de plus de 30 minutes.
  */
 function generateAlertIfNotRecent($pdo, $equipId, $niveau, $message) {
-    $stmt = $pdo->prepare("SELECT id FROM alertes WHERE equipement_id = ? AND message = ? AND est_lu = 0 LIMIT 1");
-    $stmt->execute([$equipId, $message]);
+    $stmt = $pdo->prepare("
+        SELECT id FROM alertes 
+        WHERE equipement_id = ? 
+        AND (est_lu = 0 OR cree_le > DATE_SUB(NOW(), INTERVAL 30 MINUTE))
+        LIMIT 1
+    ");
+    $stmt->execute([$equipId]);
     if ($stmt->rowCount() === 0) {
         $pdo->prepare("INSERT INTO alertes (equipement_id, niveau, message) VALUES (?, ?, ?)")
             ->execute([$equipId, $niveau, $message]);

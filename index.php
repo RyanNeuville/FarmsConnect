@@ -69,15 +69,15 @@ require 'includes/header.php';
       </header>
 
       <!-- RÉSUMÉ MÉTÉOROLOGIQUE (WEATHER WIDGET) -->
-      <div class="flex items-center gap-1.5 text-sm font-bold text-slate-500 mb-4 px-1">
-        <i data-lucide="sun" class="w-5 h-5 text-orange-400"></i>
-        <span class="text-slate-800">22°C</span>
-        <span class="font-semibold text-slate-400">Ensoleillé</span>
+      <div id="weather-widget" class="flex items-center gap-1.5 text-sm font-bold text-slate-500 mb-4 px-1">
+        <i id="weather-icon" data-lucide="sun" class="w-5 h-5 text-orange-400"></i>
+        <span id="weather-temp" class="text-slate-800">22°C</span>
+        <span id="weather-desc" class="font-semibold text-slate-400">Ensoleillé</span>
       </div>
 
       <!-- BANNIÈRE GLOBALE DE STATUT (STATUS BANNER) -->
-      <div class="bg-brand-green-light border border-brand-green rounded-xl p-3 mb-6">
-        <p class="font-bold text-green-600 text-sm">
+      <div id="status-banner" class="bg-brand-green-light border border-brand-green rounded-xl p-3 mb-6 transition-all duration-500">
+        <p id="status-message" class="font-bold text-green-600 text-sm">
           Bonjour <?= htmlspecialchars($user_nom) ?>, Tout va bien 🌾
         </p>
       </div>
@@ -221,6 +221,27 @@ function refreshDashboard() {
                         }
                     }
                 });
+
+                // Mise à jour de la Météo
+                if (data.weather) {
+                    document.getElementById('weather-temp').innerText = data.weather.temp + '°C';
+                    document.getElementById('weather-desc').innerText = data.weather.condition;
+                    const wIcon = document.getElementById('weather-icon');
+                    wIcon.setAttribute('data-lucide', data.weather.icon);
+                    wIcon.classList.toggle('text-orange-400', data.weather.icon === 'sun');
+                    wIcon.classList.toggle('text-blue-400', data.weather.icon === 'moon');
+                }
+
+                // Mise à jour de la Bannière de Statut
+                if (data.system_status) {
+                    const banner = document.getElementById('status-banner');
+                    const msg = document.getElementById('status-message');
+                    msg.innerText = `Bonjour ${"<?= htmlspecialchars($user_nom) ?>"}, ${data.system_status.message}`;
+                    
+                    banner.className = `border rounded-xl p-3 mb-6 transition-all duration-500 ${data.system_status.class}`;
+                    const msgClass = data.system_status.is_ok ? 'text-green-600' : 'text-red-600';
+                    msg.className = `font-bold text-sm ${msgClass}`;
+                }
 
                 // Mise à jour de la section Activités Récentes
                 const activitiesContainer = document.getElementById('activities-container');
