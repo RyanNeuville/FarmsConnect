@@ -9,7 +9,15 @@ require_once 'includes/auth.php';
 
 forcer_connexion();
 
-$user_nom = $_SESSION['user_nom'] ?? 'Utilisateur';
+// Informations Utilisateur
+$user_nom   = $_SESSION['user_nom']   ?? 'Utilisateur';
+$user_email = $_SESSION['user_email'] ?? 'administrateur@farmsconnect.com';
+$user_role  = 'Super Administrateur';
+
+// Chargement des paramètres système
+$stmtS = $pdo->query("SELECT valeur FROM parametres_systeme WHERE cle = 'vitesse_simulation'");
+$vitesse_actuelle = $stmtS->fetchColumn() ?: '1.0';
+
 $message_succes = '';
 
 /* Interception et traitement du flux POST lors de la soumission du formulaire de configuration */
@@ -74,8 +82,10 @@ require 'includes/header.php';
           </div>
           <div class="flex-1">
             <h2 class="text-lg font-black leading-tight"><?= htmlspecialchars($user_nom) ?></h2>
-            <div class="flex items-center gap-2 mt-1">
-                <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] font-black uppercase tracking-wider rounded-md border border-green-500/30">Connecté</span>
+            <p class="text-[11px] text-white/70 font-bold"><?= htmlspecialchars($user_email) ?></p>
+            <div class="flex items-center gap-2 mt-2">
+                <span class="px-2 py-0.5 bg-green-500/20 text-green-400 text-[9px] font-black uppercase tracking-wider rounded-md border border-green-500/30">En ligne</span>
+                <span class="px-2 py-0.5 bg-white/10 text-white/80 text-[9px] font-black uppercase tracking-wider rounded-md border border-white/20"><?= $user_role ?></span>
             </div>
           </div>
         </div>
@@ -179,11 +189,103 @@ require 'includes/header.php';
           </button>
       </form>
 
-      <form action="logout.php" method="POST">
-          <button type="submit" class="btn-outline text-red-500 border-red-200 bg-red-50 flex items-center justify-center gap-2 w-full">
-            <i data-lucide="log-out" class="w-4 h-4"></i> Déconnexion
-          </button>
-      </form>
+      <!-- SECTION SYSTÈME -->
+      <div class="card-border p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-purple-100 rounded-md flex items-center justify-center text-purple-500"><i data-lucide="zap" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-[#0f2b46] text-sm">Paramètres Système</h3>
+        </div>
+        <div class="mb-4">
+            <div class="flex justify-between mb-2">
+                <label class="text-xs font-black text-slate-500 uppercase">Vitesse de Simulation</label>
+                <span id="vitesse-val" class="text-xs font-black text-purple-600"><?= $vitesse_actuelle ?>x</span>
+            </div>
+            <input type="range" id="sim-speed" min="0.1" max="5.0" step="0.1" value="<?= $vitesse_actuelle ?>" 
+                   class="w-full h-2 bg-slate-100 rounded-lg appearance-none cursor-pointer accent-purple-600"
+                   oninput="updateSpeedVal(this.value)" onchange="saveSpeed(this.value)">
+            <p class="text-[10px] text-slate-400 font-bold mt-2 italic">Ajuste la vitesse à laquelle les capteurs fluctuent en temps réel.</p>
+        </div>
+      </div>
+
+      <!-- SECTION PRÉFÉRENCES (MOCK) -->
+      <div class="card-border p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-orange-100 rounded-md flex items-center justify-center text-orange-500"><i data-lucide="layout" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-[#0f2b46] text-sm">Préférences d'Affichage</h3>
+        </div>
+        <div class="flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+                <span class="text-[12px] font-bold text-slate-600">Langue de l'interface</span>
+                <span class="text-[11px] font-black text-slate-400">Français (FR)</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-[12px] font-bold text-slate-600">Unités de mesure</span>
+                <span class="text-[11px] font-black text-slate-400">Métriques (°C, %)</span>
+            </div>
+            <div class="flex justify-between items-center opacity-50">
+                <span class="text-[12px] font-bold text-slate-600">Thème Sombre</span>
+                <span class="text-[10px] font-black bg-slate-100 px-2 py-0.5 rounded text-slate-400 uppercase">Bientôt</span>
+            </div>
+        </div>
+      </div>
+
+      <!-- SECTION SÉCURITÉ (MOCK) -->
+      <div class="card-border p-4 mb-6">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-green-100 rounded-md flex items-center justify-center text-green-500"><i data-lucide="shield" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-[#0f2b46] text-sm">Sécurité</h3>
+        </div>
+        <button class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold text-slate-600 flex items-center justify-between">
+            Changer le mot de passe <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+        </button>
+      </div>
+
+      <!-- SECTION MAINTENANCE -->
+      <div class="card-border p-4 mb-24 bg-red-50/20 border-red-100">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-6 h-6 bg-red-100 rounded-md flex items-center justify-center text-red-500"><i data-lucide="wrench" class="w-3.5 h-3.5"></i></div>
+          <h3 class="font-bold text-red-700 text-sm">Maintenance</h3>
+        </div>
+        <div class="flex flex-col gap-3">
+            <button onclick="runMaintenance('clear_alerts')" class="w-full p-4 bg-white border border-red-200 rounded-xl text-[12px] font-black text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <i data-lucide="trash-2" class="w-4 h-4"></i> Supprimer toutes les alertes
+            </button>
+            <button onclick="runMaintenance('clear_history')" class="w-full p-4 bg-white border border-red-200 rounded-xl text-[12px] font-black text-red-600 hover:bg-red-50 transition-colors flex items-center justify-center gap-2 shadow-sm">
+                <i data-lucide="history" class="w-4 h-4"></i> Vider l'historique des données
+            </button>
+        </div>
+      </div>
+
+      <script>
+      function updateSpeedVal(val) {
+          document.getElementById('vitesse-val').innerText = val + 'x';
+      }
+
+      function saveSpeed(val) {
+          fetch('api/save_system_settings.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+              body: 'vitesse=' + val
+          });
+      }
+
+      function runMaintenance(action) {
+          const labels = {
+              'clear_alerts': 'toutes les alertes',
+              'clear_history': 'l\'historique des données'
+          };
+          if(!confirm('Es-tu sûr de vouloir supprimer ' + labels[action] + ' ?')) return;
+          
+          fetch('api/manage_maintenance.php?action=' + action)
+          .then(res => res.json())
+          .then(data => {
+              if(data.success) {
+                  alert(data.message);
+                  if(action === 'clear_alerts') location.reload();
+              }
+          });
+      }
+      </script>
     </main>
 
 <?php

@@ -29,18 +29,24 @@ function runSimulationEngine($pdo) {
     file_put_contents($cacheFile, $now);
 
     /* 
+     * -- PHASE 0 : CHARGEMENT DES PARAMETRES --
+     */
+    $stmtP = $pdo->query("SELECT valeur FROM parametres_systeme WHERE cle = 'vitesse_simulation'");
+    $vitesse = (float)($stmtP->fetchColumn() ?: 1.0);
+
+    /* 
      * -- PHASE 1 : FLUCTUATION DES CAPTEURS --
      */
     $stmt = $pdo->query("SELECT * FROM equipements WHERE type = 'capteur' AND id != 7"); // On ignore le capteur intrusion ici
     $capteurs = $stmt->fetchAll();
 
     foreach ($capteurs as $capteur) {
-        // Dérive aléatoire (±0.5 maximum)
-        $changement = mt_rand(-50, 50) / 100;
+        // Dérive aléatoire (±0.5 maximum, multipliée par la vitesse)
+        $changement = (mt_rand(-50, 50) / 100) * $vitesse;
         
-        // Comportement spécifique : La batterie décline très lentement (division par 5 du facteur précédent)
+        // Comportement spécifique : La batterie décline lentement
         if ($capteur['icone'] === 'battery-medium') {
-            $changement = - (mt_rand(1, 2) / 100); 
+            $changement = - (mt_rand(1, 2) / 100) * $vitesse; 
         }
 
         $nouvelleValeur = max(0, (float)$capteur['valeur_actuelle'] + $changement);
