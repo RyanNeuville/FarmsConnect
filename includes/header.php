@@ -31,6 +31,13 @@ if (!isset($body_class)) {
     <link rel="stylesheet" href="css/app.css" />
 
     <script>
+      // Initialisation immédiate du thème pour éviter le flash blanc
+      if (localStorage.getItem('theme') === 'dark') {
+          document.documentElement.classList.add('dark');
+          document.addEventListener('DOMContentLoaded', () => document.body.classList.add('dark'));
+      }
+    </script>
+    <script>
       tailwind.config = {
         theme: {
           extend: {

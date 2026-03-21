@@ -1,13 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+:root {
+    --bg-main: #fafbfd;
+    --bg-card: #ffffff;
+    --text-main: #1e293b;
+    --text-dim: #94a3b8;
+    --text-brand: #0f2b46;
+    --border-main: #e2e8f0;
+}
+
+body.dark {
+    --bg-main: #0a1120;
+    --bg-card: #111a2e;
+    --text-main: #f1f5f9;
+    --text-dim: #64748b;
+    --text-brand: #ffffff;
+    --border-main: #1e293b;
+}
 
 body {
     font-family: 'Nunito', sans-serif;
     -webkit-tap-highlight-color: transparent;
     user-select: none;
-    background-color: #fafbfd;
-    /* Very light blue-grey background */
-    color: #1e293b;
-    /* slate-800 */
+    background-color: var(--bg-main);
+    color: var(--text-main);
 }
 
 
@@ -37,7 +51,7 @@ html {
 
 /* Custom utility colors matching the screenshots */
 .text-brand-dark {
-    color: #0f2b46;
+    color: var(--text-brand);
 }
 
 /* Dark blue for titles like "Ferme Connectée" */
@@ -98,9 +112,9 @@ html {
 }
 
 .card-border {
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-main);
     border-radius: 16px;
-    background-color: #ffffff;
+    background-color: var(--bg-card);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
 }
 
@@ -120,7 +134,7 @@ html {
 
 /* Progress bar backgrounds */
 .progress-track {
-    background-color: #e2e8f0;
+    background-color: var(--border-main);
     border-radius: 9999px;
     height: 8px;
     width: 100%;
@@ -142,8 +156,8 @@ html {
 
 /* Bottom navigation styling */
 .bottom-nav {
-    border-top: 1px solid #f1f5f9;
-    background-color: #ffffff;
+    border-top: 1px solid var(--border-main);
+    background-color: var(--bg-card);
 }
 
 .nav-item {
@@ -151,7 +165,7 @@ html {
     flex-direction: column;
     align-items: center;
     gap: 4px;
-    color: #94a3b8;
+    color: var(--text-dim);
     font-size: 0.65rem;
     font-weight: 700;
 }
@@ -198,8 +212,9 @@ html {
 }
 /* Custom Input Styling from reglages.php */
 input[type="number"] {
-  border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px;
-  font-weight: 700; color: #0f2b46; outline: none; width: 100%;
+  border: 1px solid var(--border-main); border-radius: 8px; padding: 8px 12px;
+  font-weight: 700; color: var(--text-main); outline: none; width: 100%;
+  background-color: var(--bg-card);
   -moz-appearance: textfield; /* Remove arrows in Firefox */
   appearance: textfield;
 }

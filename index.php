@@ -53,7 +53,7 @@ require 'includes/header.php';
             <img src="assets/icon.png" alt="FarmsConnect Logo" class="w-6 h-6" />
           </div>
           <div>
-            <h1 class="text-[1.1rem] font-black text-[#0f2b46] leading-tight">FarmsConnect</h1>
+            <h1 class="text-[1.1rem] font-black text-brand-dark dark:text-white leading-tight">FarmsConnect</h1>
             <p class="text-xs text-slate-400 font-bold" id="last-update-time">Mis à jour à <?= date('H:i') ?></p>
           </div>
         </div>
@@ -73,10 +73,10 @@ require 'includes/header.php';
 
       <!-- RÉSUMÉ MÉTÉOROLOGIQUE (WEATHER WIDGET) -->
       <?php $weather = simulateWeather(); ?>
-      <div id="weather-widget" class="flex items-center gap-1.5 text-sm font-bold text-slate-500 mb-4 px-1">
+      <div id="weather-widget" class="flex items-center gap-1.5 text-sm font-bold text-slate-500 dark:text-slate-400 mb-4 px-1">
         <i id="weather-icon" data-lucide="<?= $weather['icon'] ?>" class="w-5 h-5 <?= $weather['icon'] === 'sun' ? 'text-orange-400' : 'text-blue-400' ?>"></i>
-        <span id="weather-temp" class="text-slate-800"><?= $weather['temp'] ?></span>
-        <span id="weather-desc" class="font-semibold text-slate-400"><?= $weather['condition'] ?></span>
+        <span id="weather-temp" class="text-slate-800 dark:text-slate-200"><?= $weather['temp'] ?></span>
+        <span id="weather-desc" class="font-semibold text-slate-400 dark:text-slate-500"><?= $weather['condition'] ?></span>
       </div>
 
       <!-- BANNIÈRE GLOBALE DE STATUT (STATUS BANNER) -->
@@ -96,10 +96,10 @@ require 'includes/header.php';
             </div>
             <div class="sensor-status"><?= getStatusBadge($cap['statut']) ?></div>
           </div>
-          <h3 class="text-xs font-bold text-slate-800 mb-1"><?= htmlspecialchars($cap['nom']) ?></h3>
+          <h3 class="text-xs font-bold text-slate-800 dark:text-slate-300 mb-1"><?= htmlspecialchars($cap['nom']) ?></h3>
           <div class="flex items-baseline gap-1">
-            <span class="text-xl font-black text-black sensor-value"><?= $cap['valeur_actuelle'] ?></span>
-            <span class="text-xs font-bold text-slate-400"><?= $cap['unite'] ?></span>
+            <span class="text-xl font-black text-black dark:text-white sensor-value"><?= $cap['valeur_actuelle'] ?></span>
+            <span class="text-xs font-bold text-slate-400 dark:text-slate-500"><?= $cap['unite'] ?></span>
             <div class="sensor-trend"><?= getTrendIcon($cap['valeur_actuelle'], $cap['nom']) ?></div>
           </div>
           <div class="progress-track">
@@ -126,7 +126,7 @@ require 'includes/header.php';
             </div>
             <?= getStatusBadge($act['statut']) ?>
           </div>
-          <h3 class="text-xs font-bold text-slate-800 mb-3"><?= htmlspecialchars($act['nom']) ?></h3>
+          <h3 class="text-xs font-bold text-slate-800 dark:text-slate-300 mb-3"><?= htmlspecialchars($act['nom']) ?></h3>
           <div class="actuator-control-container" data-id="<?= $act['id'] ?>">
             <?= getActionButton($act['statut'], $act['id']) ?>
           </div>
