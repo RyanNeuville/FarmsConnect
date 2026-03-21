@@ -54,14 +54,14 @@ require 'includes/header.php';
         
         <div class="flex gap-2">
           <?php if ($nonLues > 0): ?>
-          <a href="api/manage_alerts.php?action=mark_all_read" class="w-10 h-10 bg-white card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-green-500 transition-colors" title="Tout lire">
+          <button onclick="markAllRead()" class="w-10 h-10 bg-white dark:bg-slate-800 card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-green-500 transition-colors" title="Tout lire">
             <i data-lucide="check-check" class="w-5 h-5"></i>
-          </a>
+          </button>
           <?php endif; ?>
           <?php if (!empty($alertes)): ?>
-          <a href="api/manage_alerts.php?action=delete_all" onclick="return confirm('Voulez-vous vraiment vider tout le journal ?')" class="w-10 h-10 bg-white card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors" title="Tout supprimer">
+          <button onclick="deleteAllAlerts()" class="w-10 h-10 bg-white dark:bg-slate-800 card-border rounded-xl flex items-center justify-center text-slate-400 hover:text-red-500 transition-colors" title="Tout supprimer">
             <i data-lucide="trash-2" class="w-5 h-5"></i>
-          </a>
+          </button>
           <?php endif; ?>
           <a href="logout.php" class="w-10 h-10 bg-white card-border rounded-xl flex items-center justify-center text-red-500 hover:bg-red-50 transition-colors" title="Déconnexion">
             <i data-lucide="log-out" class="w-5 h-5"></i>
@@ -177,3 +177,28 @@ require 'includes/header.php';
 require 'includes/nav.php';
 require 'includes/footer.php';
 ?>
+<script>
+function markAllRead() {
+    fetch('api/manage_alerts.php?action=mark_all_read')
+    .then(res => res.json())
+    .then(data => {
+        showToast(data.message || 'Alertes marquées comme lues', 'success');
+        setTimeout(() => location.reload(), 1500);
+    });
+}
+
+function deleteAllAlerts() {
+    showConfirm('Voulez-vous vraiment vider tout le journal des alertes ?', () => {
+        fetch('api/manage_alerts.php?action=delete_all')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                showToast('Journal des alertes vidé avec succès', 'success');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showToast('Erreur lors de la suppression', 'error');
+            }
+        });
+    });
+}
+</script>

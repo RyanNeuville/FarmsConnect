@@ -323,8 +323,9 @@ require 'includes/header.php';
               })
               .then(res => res.json())
               .then(data => {
-                  alert(data.message);
-                  if(data.success) location.reload();
+                  const type = data.success ? 'success' : 'error';
+                  showToast(data.message, type);
+                  if(data.success) setTimeout(() => location.reload(), 1500);
               });
           };
       }
@@ -338,7 +339,7 @@ require 'includes/header.php';
               method: 'POST',
               headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
               body: 'vitesse=' + val
-          });
+          }).then(() => showToast('Vitesse de simulation mise à jour', 'success'));
       }
 
       function runMaintenance(action) {
@@ -346,15 +347,17 @@ require 'includes/header.php';
               'clear_alerts': 'toutes les alertes',
               'clear_history': 'l\'historique des données'
           };
-          if(!confirm('Es-tu sûr de vouloir supprimer ' + labels[action] + ' ?')) return;
-          
-          fetch('api/manage_maintenance.php?action=' + action)
-          .then(res => res.json())
-          .then(data => {
-              if(data.success) {
-                  alert(data.message);
-                  if(action === 'clear_alerts') location.reload();
-              }
+          showConfirm('Es-tu sûr de vouloir supprimer ' + labels[action] + ' ?', () => {
+              fetch('api/manage_maintenance.php?action=' + action)
+              .then(res => res.json())
+              .then(data => {
+                  if(data.success) {
+                      showToast(data.message, 'success');
+                      if(action === 'clear_alerts') setTimeout(() => location.reload(), 1500);
+                  } else {
+                      showToast(data.message || 'Une erreur est survenue', 'error');
+                  }
+              });
           });
       }
       </script>
