@@ -85,4 +85,26 @@ function formatDate($dateStr) {
         return $dateStr;
     }
 }
+/**
+ * Simule des données météo en fonction de l'heure actuelle (cycle circadien).
+ * Température plus basse la nuit, pic en milieu d'après-midi.
+ * 
+ * @return array ['temp', 'condition', 'icon']
+ */
+function simulateWeather() {
+    $hour = (int)date('H');
+    
+    // Courbe sinusoïdale simple : Min à 4h, Max à 16h
+    // Moyenne 21°C, Amplitude +/- 7°C
+    $tempBase = 21 + 7 * sin(($hour - 10) * pi() / 12);
+    $temp = round($tempBase + (mt_rand(-5, 5) / 10), 1); // Petite variation aléatoire
+    
+    $isNight = ($hour > 19 || $hour < 7);
+    
+    return [
+        'temp' => $temp . '°C',
+        'condition' => $isNight ? 'Nuit étoilée' : ($temp > 25 ? 'Chaleur intense' : 'Ensoleillé'),
+        'icon' => $isNight ? 'moon' : 'sun'
+    ];
+}
 ?>

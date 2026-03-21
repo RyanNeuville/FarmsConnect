@@ -72,10 +72,11 @@ require 'includes/header.php';
       </header>
 
       <!-- RÉSUMÉ MÉTÉOROLOGIQUE (WEATHER WIDGET) -->
+      <?php $weather = simulateWeather(); ?>
       <div id="weather-widget" class="flex items-center gap-1.5 text-sm font-bold text-slate-500 mb-4 px-1">
-        <i id="weather-icon" data-lucide="sun" class="w-5 h-5 text-orange-400"></i>
-        <span id="weather-temp" class="text-slate-800">22°C</span>
-        <span id="weather-desc" class="font-semibold text-slate-400">Ensoleillé</span>
+        <i id="weather-icon" data-lucide="<?= $weather['icon'] ?>" class="w-5 h-5 <?= $weather['icon'] === 'sun' ? 'text-orange-400' : 'text-blue-400' ?>"></i>
+        <span id="weather-temp" class="text-slate-800"><?= $weather['temp'] ?></span>
+        <span id="weather-desc" class="font-semibold text-slate-400"><?= $weather['condition'] ?></span>
       </div>
 
       <!-- BANNIÈRE GLOBALE DE STATUT (STATUS BANNER) -->

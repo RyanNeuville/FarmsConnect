@@ -42,13 +42,8 @@ try {
     ");
     $activites = $stmtRecent->fetchAll();
 
-    /* Simulation de données météo simples */
-    $tempExt = 22 + (mt_rand(-20, 20) / 10);
-    $weather = [
-        'temp' => round($tempExt, 1),
-        'condition' => (date('H') > 19 || date('H') < 6) ? 'Nuit étoilée' : 'Ensoleillé',
-        'icon' => (date('H') > 19 || date('H') < 6) ? 'moon' : 'sun'
-    ];
+    /* Simulation de données météo temporelles centralisées */
+    $weather = simulateWeather();
 
     /* Calcul de l'état global du système */
     $hasCritical = false;
